@@ -24,11 +24,11 @@ import uk.gov.voa.htmlcheck.elements.{ContainerElement, HtmlElement}
 
 import scala.language.{implicitConversions, reflectiveCalls}
 
-case class Html(htmlBody: String)
+case class Html(body: String)
   extends HtmlElement
     with ContainerElement {
 
-  lazy val element = Jsoup.parse(htmlBody)
+  lazy val element = Jsoup.parse(body)
 
   lazy val heading: HtmlCheckError Xor String = element.getElementsByTag("h1") match {
     case elements if elements.isEmpty => Left(ElementOfTypeNotFound("h1"))
