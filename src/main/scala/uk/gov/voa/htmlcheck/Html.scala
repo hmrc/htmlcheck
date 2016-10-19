@@ -49,6 +49,8 @@ object Html {
     val asHtml = Html(content.body)
   }
 
+  implicit def convertToHtml(html: {def body: String}): Html = Html(html.body)
+
   implicit def addXorOps[E](xor: Xor[HtmlCheckError, E]): XorOps[E] = new XorOps[E](xor)
 
   class XorOps[E](xor: Xor[HtmlCheckError, E]) {
