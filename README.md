@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/hmrc/htmlcheck.svg?branch=master)](https://travis-ci.org/hmrc/htmlcheck) [ ![Download](https://api.bintray.com/packages/hmrc/releases/htmlcheck/images/download.svg) ](https://bintray.com/hmrc/releases/htmlcheck/_latestVersion)
 
-This is a placeholder README.md for a new repository
+This is a simple library to allow testing html content.
 
 ### License
 
