@@ -21,14 +21,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{ElementOfTypeNotFound, ElementOutOfBounds, ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck._
 
 class ContainerElementSpec extends UnitSpec {
 
   "firstChild" should {
 
     "return HtmlCheckError when there are no children" in new TestCase {
-      val Left(error) = parent.findChildById[Div]("inner-div").flatMap(_.firstChild[Div])
+      val Left(error) = parent.findChildById[Div](ElementId("inner-div")).flatMap(_.firstChild[Div])
       error shouldBe a[ElementOfTypeNotFound]
     }
 
@@ -45,12 +45,12 @@ class ContainerElementSpec extends UnitSpec {
   "findChildById" should {
 
     "return HtmlCheckError when no child found with the given id" in new TestCase {
-      val Left(error) = parent.findChildById[Li]("invalid-id")
+      val Left(error) = parent.findChildById[Li](ElementId("invalid-id"))
       error shouldBe a[HtmlCheckError]
     }
 
     "return child with the given id" in new TestCase {
-      parent.findChildById[TextArea]("1").getOrError.elementId shouldBe Some(ElementId("1"))
+      parent.findChildById[TextArea](ElementId("1")).getOrError.elementId shouldBe Some(ElementId("1"))
     }
   }
 
@@ -94,15 +94,47 @@ class ContainerElementSpec extends UnitSpec {
     }
   }
 
+  "findChildrenByClass" should {
+
+    "return all children of the required type having the given class" in new TestCase {
+      parent.findChildrenByClass[TextArea](ElementClass("area-class")).getOrError.map(_.id) shouldBe Seq(
+        Some(ElementId("1")), Some(ElementId("2"))
+      )
+    }
+
+    "return no children if there are no children of the given class" in new TestCase {
+      parent.findChildrenByClass[TextArea](ElementClass("unknown-class")) shouldBe Left(NoElementsOfClassFound("textarea", ElementClass("unknown-class")))
+    }
+
+    "return no children if there are children of the given class but of different type" in new TestCase {
+      parent.findChildrenByClass[P](ElementClass("area-class")) shouldBe Left(NoElementsOfClassFound("p", ElementClass("area-class")))
+    }
+  }
+
+  "findFirstChildWithClass" should {
+
+    "return first child of the required type having the given class" in new TestCase {
+      parent.findFirstChildWithClass[TextArea](ElementClass("area-class")).getOrError.id shouldBe Some(ElementId("1"))
+    }
+
+    "return no child if there are no children of the given class" in new TestCase {
+      parent.findFirstChildWithClass[TextArea](ElementClass("unknown-class")) shouldBe Left(NoElementsOfClassFound("textarea", ElementClass("unknown-class")))
+    }
+
+    "return no child if there are children of the given class but of different type" in new TestCase {
+      parent.findFirstChildWithClass[P](ElementClass("area-class")) shouldBe Left(NoElementsOfClassFound("p", ElementClass("area-class")))
+    }
+  }
+
   private trait TestCase {
     self =>
 
     val element = Jsoup.parse(
       """
         |<div id="div">
-        | <textarea id="1"></textArea>
+        | <textarea id="1" class="area-class"></textArea>
         | <p></p>
-        | <textarea id="2"></textArea>
+        | <textarea id="2" class="area-class"></textArea>
         | <div id="inner-div"></div>
         |</div>
       """.stripMargin).getElementById("div")

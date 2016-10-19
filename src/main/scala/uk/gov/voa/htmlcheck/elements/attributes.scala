@@ -49,7 +49,9 @@ object ElementText {
   def apply(element: Element): ElementText = ElementText(element.text())
 }
 
-case class ElementClass(name: String)
+case class ElementClass(name: String) {
+  override def toString = name
+}
 
 object ElementClass {
 

@@ -20,7 +20,7 @@ import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.elements.{ContainerElement, HtmlElement}
+import uk.gov.voa.htmlcheck.elements.{ContainerElement, ElementId, HtmlElement}
 
 import scala.language.{implicitConversions, reflectiveCalls}
 
@@ -37,8 +37,8 @@ case class Html(body: String)
 
   lazy val title = element.title
 
-  def findElementById[E <: HtmlElement](id: String)(implicit elementWrapper: Element => HtmlCheckError Xor E): HtmlCheckError Xor E =
-    Xor.fromOption(Option(element.getElementById(id)), ElementWithIdNotFound(id))
+  def findElementById[E <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor E): HtmlCheckError Xor E =
+    Xor.fromOption(Option(element.getElementById(id.id)), ElementWithIdNotFound(id))
       .flatMap(element => elementWrapper(element))
 }
 

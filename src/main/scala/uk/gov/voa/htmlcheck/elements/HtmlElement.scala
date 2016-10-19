@@ -36,7 +36,7 @@ trait ElementProperties {
 
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =
-    Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound(element.id))
+    Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound(id))
       .flatMap(elementWrapper)
 
   override def toString = ElementId(element).map(_.toString)
@@ -53,9 +53,9 @@ trait ContainerElement {
     Xor.fromOption(Option(element.children().first()), ElementOfTypeNotFound(getTagTypeFromManifest, Some("as first child")))
       .flatMap(elementWrapper)
 
-  def findChildById[T <: HtmlElement](id: String)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                  manifest: Manifest[T]): HtmlCheckError Xor T =
-    Xor.fromOption(Option(element.getElementById(id)), ElementWithIdNotFound(id))
+  def findChildById[T <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                     manifest: Manifest[T]): HtmlCheckError Xor T =
+    Xor.fromOption(Option(element.getElementById(id.id)), ElementWithIdNotFound(id))
       .flatMap(elementWrapper)
 
   def findFirstChildOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
@@ -76,6 +76,30 @@ trait ContainerElement {
     findChildrenOfType flatMap {
       case children if children.size > index => Right(children(index))
       case children => Left(ElementOutOfBounds(getTagTypeFromManifest, children.size, index))
+    }
+
+  def findChildrenByClass[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                                     manifest: Manifest[T]): HtmlCheckError Xor Seq[T] =
+    element.getElementsByClass(className.name).iterator().toSeq match {
+      case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
+      case elements => elements
+        .map(elementWrapper)
+        .filter(errorOrElement => errorOrElement.isRight) match {
+        case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
+        case xorsWithoutErrors => Right(xorsWithoutErrors.foldLeft(Seq.empty[T])((foundChildren, item) => foundChildren :+ item.getOrError))
+      }
+    }
+
+  def findFirstChildWithClass[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                                         manifest: Manifest[T]): HtmlCheckError Xor T =
+    element.getElementsByClass(className.name).iterator().toSeq match {
+      case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
+      case elements => elements
+        .map(elementWrapper)
+        .filter(errorOrElement => errorOrElement.isRight) match {
+        case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
+        case xorsWithoutErrors => Right(xorsWithoutErrors.head.getOrError)
+      }
     }
 
   private def getTagTypeFromManifest(implicit manifest: Manifest[_]) =
