@@ -31,9 +31,9 @@ case class Fieldset(protected val element: Element)
 
 object Fieldset {
 
-  implicit def divElementWrapper(element: Element): HtmlCheckError Xor Legend =
+  implicit def fieldsetElementWrapper(element: Element): HtmlCheckError Xor Fieldset =
     if (element.tagName() != "fieldset")
       Left(ElementWithIdOfWrongType(IdAttribute(element), "fieldset", element.tagName()))
     else
-      Right(Legend(element))
+      Right(Fieldset(element))
 }
