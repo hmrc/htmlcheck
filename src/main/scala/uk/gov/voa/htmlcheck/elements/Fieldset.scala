@@ -28,7 +28,7 @@ case class Fieldset(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Fieldset extends ErrorElementsFinder {
+object Fieldset {
 
   implicit def divElementWrapper(element: Element): HtmlCheckError Xor Legend =
     if (element.tagName() != "fieldset")

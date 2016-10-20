@@ -21,59 +21,43 @@ import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
-import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 
-case class Select(options: List[SelectOption],
-                  errors: Seq[ErrorElement] = Nil)
-                 (protected val element: Element)
+case class Select(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ContainerElement
     with ErrorElements {
 
-  lazy val selectedOption: Option[SelectOption] = options.find(_.selected)
+  lazy val options: Xor[HtmlCheckError, Seq[SelectOption]] = findChildrenOfType[SelectOption]
 
-  lazy val selectedOptionValue: Option[ElementValue] = options.find(_.selected).flatMap(_.value)
+  lazy val selectedOptions: Xor[HtmlCheckError, Seq[SelectOption]] = options.map(_.filter(_.selected))
 
 }
 
-object Select extends ErrorElementsFinder {
+object Select {
 
   implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Select =
     if (element.tagName() != "select")
       Left(ElementWithIdOfWrongType(ElementId(element), "select", element.tagName()))
     else
-      Right(Select(
-        options = element.children().toList.map(child => SelectOption(child)),
-        errors = findElementErrors(element)
-      )(element))
+      Right(Select(element))
 
 }
 
-case class SelectOption(id: Option[ElementId],
-                        value: Option[ElementValue],
-                        text: ElementText,
-                        selected: Boolean = false)
+case class SelectOption(protected val element: Element)
+  extends HtmlElement
+    with ElementProperties
+    with ContainerElement {
+
+  lazy val selected: Boolean = element.attr("selected") == "selected"
+}
 
 object SelectOption {
 
-  def apply(element: Element): SelectOption = SelectOption(
-    ElementId(element),
-    ElementValue(element),
-    ElementText(element),
-    selected = element.attr("selected") == "selected"
-  )
-
-  def apply(elementId: ElementId, elementValue: ElementValue, elementText: ElementText): SelectOption = SelectOption(
-    Some(elementId),
-    Some(elementValue),
-    elementText
-  )
-
-  def apply(elementText: ElementText): SelectOption = SelectOption(
-    id = None,
-    value = None,
-    text = elementText
-  )
+  implicit def optionElementWrapper(element: Element): HtmlCheckError Xor SelectOption =
+    if (element.tagName() != "option")
+      Left(ElementWithIdOfWrongType(ElementId(element), "option", element.tagName()))
+    else
+      Right(SelectOption(element))
 }

@@ -29,7 +29,7 @@ case class Ul(elementId: Option[ElementId])
     with ElementProperties
     with ContainerElement
 
-object Ul extends ErrorElementsFinder {
+object Ul {
 
   implicit def ulElementWrapper(element: Element): HtmlCheckError Xor Ul =
     if (element.tagName() != "ul")
@@ -47,7 +47,7 @@ case class Li(elementId: Option[ElementId])
   lazy val text: String = element.text
 }
 
-object Li extends ErrorElementsFinder {
+object Li {
 
   implicit def liElementWrapper(element: Element): HtmlCheckError Xor Li =
     if (element.tagName() != "li")

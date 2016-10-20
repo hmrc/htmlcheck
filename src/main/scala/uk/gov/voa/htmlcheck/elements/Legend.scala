@@ -28,7 +28,7 @@ case class Legend(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Legend extends ErrorElementsFinder {
+object Legend {
 
   implicit def divElementWrapper(element: Element): HtmlCheckError Xor Legend =
     if (element.tagName() != "legend")

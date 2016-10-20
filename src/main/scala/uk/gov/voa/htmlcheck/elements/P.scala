@@ -32,7 +32,7 @@ case class P(elementId: Option[ElementId])(protected val element: Element)
 
 }
 
-object P extends ErrorElementsFinder {
+object P {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor P =
     if (element.tagName() != "p")

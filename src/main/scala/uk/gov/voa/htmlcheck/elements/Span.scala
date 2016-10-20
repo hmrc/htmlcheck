@@ -32,7 +32,7 @@ case class Span(elementId: Option[ElementId])(protected val element: Element)
 
 }
 
-object Span extends ErrorElementsFinder {
+object Span {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Span =
     if (element.tagName() != "span")

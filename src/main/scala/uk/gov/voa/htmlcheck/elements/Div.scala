@@ -28,7 +28,7 @@ case class Div(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Div extends ErrorElementsFinder {
+object Div {
 
   implicit def divElementWrapper(element: Element): HtmlCheckError Xor Div =
     if (element.tagName() != "div")

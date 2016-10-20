@@ -39,7 +39,7 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return the first child of the requested type" in new TestCase {
-      parent.firstChild[TextArea].getOrError.elementId shouldBe Some(ElementId("1"))
+      parent.firstChild[TextArea].getOrError.id shouldBe Some(ElementId("1"))
     }
   }
 
@@ -51,7 +51,7 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return child with the given id" in new TestCase {
-      parent.findDescendantBy[TextArea](ElementId("1")).getOrError.elementId shouldBe Some(ElementId("1"))
+      parent.findDescendantBy[TextArea](ElementId("1")).getOrError.id shouldBe Some(ElementId("1"))
     }
   }
 
@@ -64,7 +64,7 @@ class ContainerElementSpec extends UnitSpec {
     "return first child of the given type when it exists" in new TestCase {
       val foundChildren = parent.findFirstChildOfType[TextArea]
 
-      foundChildren.getOrError.elementId shouldBe Some(ElementId("1"))
+      foundChildren.getOrError.id shouldBe Some(ElementId("1"))
     }
   }
 
@@ -79,15 +79,15 @@ class ContainerElementSpec extends UnitSpec {
 
       foundChildren.getOrError should have size 2
 
-      foundChildren.getOrError.head.elementId shouldBe Some(ElementId("1"))
-      foundChildren.getOrError(1).elementId shouldBe Some(ElementId("2"))
+      foundChildren.getOrError.head.id shouldBe Some(ElementId("1"))
+      foundChildren.getOrError(1).id shouldBe Some(ElementId("2"))
     }
   }
 
   "findChildOfTypeByIndex" should {
 
     "return child of the given type based on index in sequence" in new TestCase {
-      parent.findChildOfTypeByIndex[TextArea](1).getOrError.elementId shouldBe Some(ElementId("2"))
+      parent.findChildOfTypeByIndex[TextArea](1).getOrError.id shouldBe Some(ElementId("2"))
     }
 
     "return ElementOutOfBounds error when no child found on that index" in new TestCase {

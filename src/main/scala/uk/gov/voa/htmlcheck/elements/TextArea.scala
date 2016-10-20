@@ -23,23 +23,16 @@ import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class TextArea(elementId: Option[ElementId],
-                    value: Option[ElementValue],
-                    errors: Seq[ErrorElement] = Nil)
-                   (protected val element: Element)
+case class TextArea(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ErrorElements
 
-object TextArea extends ErrorElementsFinder {
+object TextArea {
 
   implicit def textAreaElementWrapper(element: Element): HtmlCheckError Xor TextArea =
     if (element.tagName() != "textarea")
       Left(ElementWithIdOfWrongType(ElementId(element), "textarea", element.tagName()))
     else
-      Right(TextArea(
-        elementId = ElementId(element),
-        value = ElementValue(element),
-        errors = findElementErrors(element)
-      )(element))
+      Right(TextArea(element))
 }

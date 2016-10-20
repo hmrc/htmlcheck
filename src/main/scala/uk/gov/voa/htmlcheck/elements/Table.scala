@@ -28,7 +28,7 @@ case class Table(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Table extends ErrorElementsFinder {
+object Table {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Table =
     if (element.tagName() != "table")
@@ -46,7 +46,7 @@ case class Caption(protected val element: Element)
 
 }
 
-object Caption extends ErrorElementsFinder {
+object Caption {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Caption =
     if (element.tagName() != "caption")
@@ -60,7 +60,7 @@ case class Colgroup(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Colgroup extends ErrorElementsFinder {
+object Colgroup {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Colgroup =
     if (element.tagName() != "colgroup")
@@ -78,7 +78,7 @@ case class Col(protected val element: Element)
 
 }
 
-object Col extends ErrorElementsFinder {
+object Col {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Col =
     if (element.tagName() != "col")
@@ -92,7 +92,7 @@ case class Thead(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Thead extends ErrorElementsFinder {
+object Thead {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Thead =
     if (element.tagName() != "thead")
@@ -106,7 +106,7 @@ case class Tbody(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Tbody extends ErrorElementsFinder {
+object Tbody {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Tbody =
     if (element.tagName() != "tbody")
@@ -120,7 +120,7 @@ case class Tfoot(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Tfoot extends ErrorElementsFinder {
+object Tfoot {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Tfoot =
     if (element.tagName() != "tfoot")
@@ -134,7 +134,7 @@ case class Tr(protected val element: Element)
     with ElementProperties
     with ContainerElement
 
-object Tr extends ErrorElementsFinder {
+object Tr {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Tr =
     if (element.tagName() != "tr")
@@ -152,7 +152,7 @@ case class Th(protected val element: Element)
 
 }
 
-object Th extends ErrorElementsFinder {
+object Th {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Th =
     if (element.tagName() != "th")
@@ -170,7 +170,7 @@ case class Td(protected val element: Element)
 
 }
 
-object Td extends ErrorElementsFinder {
+object Td {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Td =
     if (element.tagName() != "td")

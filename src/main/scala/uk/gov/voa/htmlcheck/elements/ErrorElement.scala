@@ -38,15 +38,12 @@ object ErrorElement {
 
 trait ErrorElements {
 
-  def errors: Seq[ErrorElement]
+  self: HtmlElement =>
+
+  def errors: Seq[ErrorElement] =
+    nextErrorIfPresent(Option(element.previousElementSibling()), Nil)
 
   lazy val errorsTexts = errors.map(_.text)
-}
-
-trait ErrorElementsFinder {
-
-  protected def findElementErrors(element: Element): Seq[ErrorElement] =
-    nextErrorIfPresent(Option(element.previousElementSibling()), Nil)
 
   @tailrec
   private def nextErrorIfPresent(maybeElement: Option[Element], errorElements: Seq[ErrorElement]): Seq[ErrorElement] =
