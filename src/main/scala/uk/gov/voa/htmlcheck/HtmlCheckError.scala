@@ -16,7 +16,7 @@
 
 package uk.gov.voa.htmlcheck
 
-import uk.gov.voa.htmlcheck.elements.{ElementClass, ElementId}
+import uk.gov.voa.htmlcheck.elements.{ElementAttribute, ElementId}
 
 sealed trait HtmlCheckError extends Throwable {
   protected def message: String
@@ -40,12 +40,12 @@ case class ElementOfTypeNotFound(tagType: String, maybeMessage: Option[String] =
   val message = s"Element of type=$tagType not found${maybeMessage.map(message => s" $message").getOrElse("")}"
 }
 
-case class NoElementsOfClassFound(tagType: String, className: ElementClass) extends HtmlCheckError {
-  val message = s"Elements of type=$tagType having class=$className not found"
+case class NoElementsFound(tagType: String, attribute: ElementAttribute) extends HtmlCheckError {
+  val message = s"Elements of type=$tagType having ${attribute.getClass.getSimpleName}=$attribute not found"
 }
 
-case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, className: ElementClass) extends HtmlCheckError {
-  val message = s"There are $numberOfFoundElements elements of type=$tagType having class=$className found while one was expected"
+case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, attribute: ElementAttribute) extends HtmlCheckError {
+  val message = s"There are $numberOfFoundElements elements of type=$tagType having ${attribute.getClass.getSimpleName}=$attribute found while one was expected"
 }
 
 case class ElementOutOfBounds(tagType: String, size: Int, index: Int) extends HtmlCheckError {

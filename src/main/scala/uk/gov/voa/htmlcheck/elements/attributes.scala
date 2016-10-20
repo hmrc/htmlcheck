@@ -18,9 +18,13 @@ package uk.gov.voa.htmlcheck.elements
 
 import org.jsoup.nodes.Element
 
-case class ElementId(id: String) {
-  override def toString = id
+trait ElementAttribute {
+  def value: String
+
+  override def toString = value
 }
+
+case class ElementId(value: String) extends ElementAttribute
 
 object ElementId {
 
@@ -31,7 +35,7 @@ object ElementId {
     }
 }
 
-case class ElementValue(value: String)
+case class ElementValue(value: String) extends ElementAttribute
 
 object ElementValue {
 
@@ -42,16 +46,14 @@ object ElementValue {
     }
 }
 
-case class ElementText(text: String)
+case class ElementText(value: String) extends ElementAttribute
 
 object ElementText {
 
   def apply(element: Element): ElementText = ElementText(element.text())
 }
 
-case class ElementClass(name: String) {
-  override def toString = name
-}
+case class ElementClass(value: String) extends ElementAttribute
 
 object ElementClass {
 
