@@ -20,6 +20,7 @@ import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
+import uk.gov.voa.htmlcheck.elements.SelectOption.SelectedAttribute
 import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
@@ -54,6 +55,22 @@ case class SelectOption(protected val element: Element)
 }
 
 object SelectOption {
+
+  private case object SelectedAttribute extends ElementAttribute {
+
+    lazy val value = "selected"
+    type SelectedAttribute = SelectedAttribute.type
+
+    def apply(element: Element): Option[SelectedAttribute] =
+      element.hasAttr("selected") match {
+        case false => None
+        case true => element.attr("selected") match {
+          case selected if selected == value => Some(SelectedAttribute)
+          case "" => Some(SelectedAttribute)
+          case _ => None
+        }
+      }
+  }
 
   implicit def optionElementWrapper(element: Element): HtmlCheckError Xor SelectOption =
     if (element.tagName() != "option")

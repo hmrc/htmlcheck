@@ -21,33 +21,33 @@ import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
 class RadioSpec extends UnitSpec {
 
-  "selected" should {
+  "checked" should {
 
-    "return true if there is a 'selected' property with value of selected" in {
+    "return true if there is a 'checked' property with value of checked" in {
       val snippet =
         """
-          |<input type="radio" selected="selected">
+          |<input type="radio" checked="checked">
           |""".stripMargin
 
-      Radio(Jsoup.parse(snippet).body().children().first()).selected shouldBe true
+      Radio(Jsoup.parse(snippet).body().children().first()).checked shouldBe true
     }
 
-    "return true if there is just a 'selected' property without value" in {
+    "return true if there is just a 'checked' property without value" in {
       val snippet =
         """
-          |<input type="radio" selected>
+          |<input type="radio" checked>
           |""".stripMargin
 
-      Radio(Jsoup.parse(snippet).body().children().first()).selected shouldBe true
+      Radio(Jsoup.parse(snippet).body().children().first()).checked shouldBe true
     }
 
-    "return false if there is no 'selected' property" in {
+    "return false if there is no 'checked' property" in {
       val snippet =
         """
           |<input type="radio">
           |""".stripMargin
 
-      Radio(Jsoup.parse(snippet).body().children().first()).selected shouldBe false
+      Radio(Jsoup.parse(snippet).body().children().first()).checked shouldBe false
     }
   }
 }

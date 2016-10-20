@@ -74,22 +74,6 @@ object ElementAttribute {
       }
   }
 
-  case object SelectedAttribute extends ElementAttribute {
-
-    lazy val value = "selected"
-    type SelectedAttribute = SelectedAttribute.type
-
-    def apply(element: Element): Option[SelectedAttribute] =
-      element.hasAttr("selected") match {
-        case false => None
-        case true => element.attr("selected") match {
-          case selected if selected == value => Some(SelectedAttribute)
-          case "" => Some(SelectedAttribute)
-          case _ => None
-        }
-      }
-  }
-
   case class ValueAttribute(value: String) extends ElementAttribute
 
   object ValueAttribute {
