@@ -41,12 +41,30 @@ case class ElementOfTypeNotFound(tagType: String, maybeMessage: Option[String] =
   val message = s"Element of type=$tagType not found${maybeMessage.map(message => s" $message").getOrElse("")}"
 }
 
-case class NoElementsFound(tagType: String, attribute: ElementAttribute) extends HtmlCheckError {
-  val message = s"Elements of type=$tagType having ${attribute.getClass.getSimpleName}=$attribute not found"
+case class NoElementsFound(tagType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
+  val message = s"Elements of type=$tagType${maybeAttribute.map(attribute => s"having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} not found"
 }
 
-case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, attribute: ElementAttribute) extends HtmlCheckError {
-  val message = s"There are $numberOfFoundElements elements of type=$tagType having ${attribute.getClass.getSimpleName}=$attribute found while one was expected"
+object NoElementsFound {
+
+  def apply(tagType: String, attribute: ElementAttribute): NoElementsFound =
+    NoElementsFound(tagType, Some(attribute))
+
+  def apply(tagType: String): NoElementsFound =
+    NoElementsFound(tagType, None)
+}
+
+case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
+  val message = s"There are $numberOfFoundElements elements of type=$tagType${maybeAttribute.map(attribute => s"having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} found while one was expected"
+}
+
+object MoreThanOneElementFound {
+
+  def apply(numberOfFoundElements: Int, tagType: String, attribute: ElementAttribute): MoreThanOneElementFound =
+    MoreThanOneElementFound(numberOfFoundElements, tagType, Some(attribute))
+
+  def apply(numberOfFoundElements: Int, tagType: String): MoreThanOneElementFound =
+    MoreThanOneElementFound(numberOfFoundElements, tagType, None)
 }
 
 case class ElementOutOfBounds(tagType: String, size: Int, index: Int) extends HtmlCheckError {

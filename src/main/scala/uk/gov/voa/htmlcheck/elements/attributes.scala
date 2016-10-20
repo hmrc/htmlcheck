@@ -63,6 +63,17 @@ object ElementAttribute {
       }
   }
 
+  case class TagAttribute(value: String) extends ElementAttribute
+
+  object TagAttribute {
+
+    def apply(element: Element): Option[TagAttribute] =
+      element.tagName() match {
+        case "" => None
+        case tag => Some(TagAttribute(tag))
+      }
+  }
+
   case class NameAttribute(value: String) extends ElementAttribute
 
   object NameAttribute {

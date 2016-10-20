@@ -20,7 +20,7 @@ import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html._
-import uk.gov.voa.htmlcheck._
+import uk.gov.voa.htmlcheck.{MoreThanOneElementFound, _}
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.elements.HtmlElement._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
@@ -59,7 +59,7 @@ class ContainerElementSpec extends UnitSpec {
   "findFirstChildOfType" should {
 
     "return ElementOfTypeNotFound when no children of the given type found" in new TestCase {
-      parent.findFirstChildOfType[Li] shouldBe Left(ElementOfTypeNotFound("li"))
+      parent.findFirstChildOfType[Li] shouldBe Left(NoElementsFound("li"))
     }
 
     "return first child of the given type when it exists" in new TestCase {
@@ -69,10 +69,25 @@ class ContainerElementSpec extends UnitSpec {
     }
   }
 
+  "findOnlyChildOfType" should {
+
+    "return ElementOfTypeNotFound when no children of the given type found" in new TestCase {
+      parent.findOnlyChildOfType[Li] shouldBe Left(NoElementsFound("li"))
+    }
+
+    "return MoreThanOneElementFound when more than one child of the given type found" in new TestCase {
+      parent.findOnlyChildOfType[TextArea] shouldBe Left(MoreThanOneElementFound(2, "textarea"))
+    }
+
+    "return a child of the given type when just one exists" in new TestCase {
+      parent.findOnlyChildOfType[Div].getOrError.id shouldBe Some(IdAttribute("inner-div"))
+    }
+  }
+
   "findChildrenOfType" should {
 
     "return ElementOfTypeNotFound when no children of the given type found" in new TestCase {
-      parent.findChildrenOfType[Li] shouldBe Left(ElementOfTypeNotFound("li"))
+      parent.findChildrenOfType[Li] shouldBe Left(NoElementsFound("li"))
     }
 
     "return all children of the given type when they exist" in new TestCase {
