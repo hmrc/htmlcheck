@@ -29,6 +29,7 @@ case class Select(options: List[SelectOption],
                  (protected val element: Element)
   extends HtmlElement
     with ElementProperties
+    with ContainerElement
     with ErrorElements {
 
   lazy val selectedOption: Option[SelectOption] = options.find(_.selected)
