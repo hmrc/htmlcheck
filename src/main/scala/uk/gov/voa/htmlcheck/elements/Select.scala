@@ -38,12 +38,11 @@ case class Select(protected val element: Element)
 
 object Select {
 
-  implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
+  implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Select =
     if (element.tagName() != "select")
       Left(ElementWithIdOfWrongType(IdAttribute(element), "select", element.tagName()))
     else
-      Right(Radio(element))
-
+      Right(Select(element))
 }
 
 case class SelectOption(protected val element: Element)
