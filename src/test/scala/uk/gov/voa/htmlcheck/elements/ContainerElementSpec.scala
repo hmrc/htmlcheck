@@ -20,15 +20,15 @@ import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html._
-import uk.gov.voa.htmlcheck.tooling.UnitSpec
 import uk.gov.voa.htmlcheck._
+import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
 class ContainerElementSpec extends UnitSpec {
 
   "firstChild" should {
 
     "return HtmlCheckError when there are no children" in new TestCase {
-      val Left(error) = parent.findChildById[Div](ElementId("inner-div")).flatMap(_.firstChild[Div])
+      val Left(error) = parent.findDescendantById[Div](ElementId("inner-div")).flatMap(_.firstChild[Div])
       error shouldBe a[ElementOfTypeNotFound]
     }
 
@@ -45,12 +45,12 @@ class ContainerElementSpec extends UnitSpec {
   "findChildById" should {
 
     "return HtmlCheckError when no child found with the given id" in new TestCase {
-      val Left(error) = parent.findChildById[Li](ElementId("invalid-id"))
+      val Left(error) = parent.findDescendantById[Li](ElementId("invalid-id"))
       error shouldBe a[HtmlCheckError]
     }
 
     "return child with the given id" in new TestCase {
-      parent.findChildById[TextArea](ElementId("1")).getOrError.elementId shouldBe Some(ElementId("1"))
+      parent.findDescendantById[TextArea](ElementId("1")).getOrError.elementId shouldBe Some(ElementId("1"))
     }
   }
 
@@ -96,18 +96,37 @@ class ContainerElementSpec extends UnitSpec {
 
   "findChildrenByClass" should {
 
-    "return all children of the required type having the given class" in new TestCase {
-      parent.findChildrenByClass[TextArea](ElementClass("area-class")).getOrError.map(_.id) shouldBe Seq(
+    val snippet =
+      """<div id="div">
+        | <textarea id="1" class="area-class"></textArea>
+        | <p></p>
+        | <textarea id="2" class="area-class"></textArea>
+        | <div id="inner-div"><textarea id="3" class="area-class"></textArea></div>
+        |</div>
+        |"""
+
+
+    "return all children of the required type with the given class" in new TestCase {
+
+      val div = html(snippet).findDescendantById[Div](ElementId("div")).getOrError
+
+      div.findChildrenByClass[TextArea](ElementClass("area-class")).getOrError.map(_.id) shouldBe Seq(
         Some(ElementId("1")), Some(ElementId("2"))
       )
     }
 
     "return no children if there are no children of the given class" in new TestCase {
-      parent.findChildrenByClass[TextArea](ElementClass("unknown-class")) shouldBe Left(NoElementsOfClassFound("textarea", ElementClass("unknown-class")))
+
+      val div = html(snippet).findDescendantById[Div](ElementId("div")).getOrError
+
+      div.findChildrenByClass[TextArea](ElementClass("unknown-class")) shouldBe Left(NoElementsOfClassFound("textarea", ElementClass("unknown-class")))
     }
 
     "return no children if there are children of the given class but of different type" in new TestCase {
-      parent.findChildrenByClass[P](ElementClass("area-class")) shouldBe Left(NoElementsOfClassFound("p", ElementClass("area-class")))
+
+      val div = html(snippet).findDescendantById[Div](ElementId("div")).getOrError
+
+      div.findChildrenByClass[P](ElementClass("area-class")) shouldBe Left(NoElementsOfClassFound("p", ElementClass("area-class")))
     }
   }
 
@@ -141,6 +160,10 @@ class ContainerElementSpec extends UnitSpec {
 
     val parent = new ContainerElement with HtmlElement with ElementProperties {
       val element: Element = self.element
+    }
+
+    def html(body: String) = new ContainerElement with HtmlElement with ElementProperties {
+      val element: Element = Jsoup.parse(body.stripMargin)
     }
   }
 

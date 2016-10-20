@@ -53,8 +53,8 @@ trait ContainerElement {
     Xor.fromOption(Option(element.children().first()), ElementOfTypeNotFound(getTagTypeFromManifest, Some("as first child")))
       .flatMap(elementWrapper)
 
-  def findChildById[T <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                     manifest: Manifest[T]): HtmlCheckError Xor T =
+  def findDescendantById[T <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                          manifest: Manifest[T]): HtmlCheckError Xor T =
     Xor.fromOption(Option(element.getElementById(id.id)), ElementWithIdNotFound(id))
       .flatMap(elementWrapper)
 
@@ -80,7 +80,8 @@ trait ContainerElement {
 
   def findChildrenByClass[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
                                                                      manifest: Manifest[T]): HtmlCheckError Xor Seq[T] =
-    element.getElementsByClass(className.name).iterator().toSeq match {
+    element.children.iterator().toSeq
+      .filter(_.classNames().toSet.contains(className.name)) match {
       case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
       case elements => elements
         .map(elementWrapper)

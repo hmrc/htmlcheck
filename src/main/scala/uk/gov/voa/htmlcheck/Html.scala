@@ -19,8 +19,7 @@ package uk.gov.voa.htmlcheck
 import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.elements.{ContainerElement, ElementId, HtmlElement}
+import uk.gov.voa.htmlcheck.elements.{ContainerElement, HtmlElement}
 
 import scala.language.{implicitConversions, reflectiveCalls}
 
@@ -36,10 +35,6 @@ case class Html(body: String)
   }
 
   lazy val title = element.title
-
-  def findElementById[E <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor E): HtmlCheckError Xor E =
-    Xor.fromOption(Option(element.getElementById(id.id)), ElementWithIdNotFound(id))
-      .flatMap(element => elementWrapper(element))
 }
 
 object Html {
@@ -56,4 +51,5 @@ object Html {
   class XorOps[E](xor: Xor[HtmlCheckError, E]) {
     def getOrError = xor.valueOr(error => throw error)
   }
+
 }
