@@ -20,6 +20,7 @@ import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html._
+import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 import uk.gov.voa.htmlcheck.{ElementSiblingNotFound, ElementWithIdOfWrongType}
 

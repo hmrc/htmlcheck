@@ -21,6 +21,7 @@ import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html._
 import uk.gov.voa.htmlcheck._
+import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions

@@ -16,7 +16,8 @@
 
 package uk.gov.voa.htmlcheck
 
-import uk.gov.voa.htmlcheck.elements.{ElementAttribute, IdAttribute}
+import uk.gov.voa.htmlcheck.elements.ElementAttribute
+import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 
 sealed trait HtmlCheckError extends Throwable {
   protected def message: String

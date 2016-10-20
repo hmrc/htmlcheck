@@ -19,6 +19,7 @@ package uk.gov.voa.htmlcheck.elements
 import cats.data.Xor
 import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
+import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
