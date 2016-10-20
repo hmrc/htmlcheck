@@ -44,6 +44,10 @@ case class NoElementsOfClassFound(tagType: String, className: ElementClass) exte
   val message = s"Elements of type=$tagType having class=$className not found"
 }
 
+case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, className: ElementClass) extends HtmlCheckError {
+  val message = s"There are $numberOfFoundElements elements of type=$tagType having class=$className found while one was expected"
+}
+
 case class ElementOutOfBounds(tagType: String, size: Int, index: Int) extends HtmlCheckError {
   val message = s"Element of type=$tagType with index $index not found in sequence of length $size"
 }

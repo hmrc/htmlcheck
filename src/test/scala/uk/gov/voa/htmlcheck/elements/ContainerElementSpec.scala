@@ -101,10 +101,8 @@ class ContainerElementSpec extends UnitSpec {
         | <textarea id="1" class="area-class"></textArea>
         | <p></p>
         | <textarea id="2" class="area-class"></textArea>
-        | <div id="inner-div"><textarea id="3" class="area-class"></textArea></div>
         |</div>
         |"""
-
 
     "return all children of the required type with the given class" in new TestCase {
 
@@ -136,12 +134,51 @@ class ContainerElementSpec extends UnitSpec {
       parent.findFirstChildBy[TextArea](ElementClass("area-class")).getOrError.id shouldBe Some(ElementId("1"))
     }
 
-    "return no child if there are no children of the given class" in new TestCase {
+    "return no children if there are no children of the given class" in new TestCase {
       parent.findFirstChildBy[TextArea](ElementClass("unknown-class")) shouldBe Left(NoElementsOfClassFound("textarea", ElementClass("unknown-class")))
     }
 
-    "return no child if there are children of the given class but of different type" in new TestCase {
+    "return no children if there are children of the given class but of different type" in new TestCase {
       parent.findFirstChildBy[P](ElementClass("area-class")) shouldBe Left(NoElementsOfClassFound("p", ElementClass("area-class")))
+    }
+  }
+
+  "findOnlyChildBy elementClass" should {
+
+    val snippet =
+      """<div id="div">
+        | <textarea id="1" class="area-class"></textArea>
+        | <p id="p1" class="p-class"></p>
+        | <textarea id="2" class="area-class"></textArea>
+        |</div>
+        |"""
+
+    "return found child of the required type having the given class" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](ElementId("div")).getOrError
+
+      div.findOnlyChildBy[P](ElementClass("p-class")).getOrError.id shouldBe Some(ElementId("p1"))
+    }
+
+    "return no children if there are more than one of the given class" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](ElementId("div")).getOrError
+
+      div.findOnlyChildBy[TextArea](ElementClass("area-class")) shouldBe Left(MoreThanOneElementFound(2, "textarea", ElementClass("area-class")))
+    }
+
+    "return no children if there are no children of the given class" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](ElementId("div")).getOrError
+
+      div.findOnlyChildBy[TextArea](ElementClass("unknown-class")) shouldBe Left(NoElementsOfClassFound("textarea", ElementClass("unknown-class")))
+    }
+
+    "return no children if there are children of the given class but of different type" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](ElementId("div")).getOrError
+
+      div.findOnlyChildBy[P](ElementClass("area-class")) shouldBe Left(NoElementsOfClassFound("p", ElementClass("area-class")))
     }
   }
 

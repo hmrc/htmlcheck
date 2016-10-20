@@ -93,14 +93,13 @@ trait ContainerElement {
 
   def findFirstChildBy[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
                                                                   manifest: Manifest[T]): HtmlCheckError Xor T =
-    element.getElementsByClass(className.name).iterator().toSeq match {
-      case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
-      case elements => elements
-        .map(elementWrapper)
-        .filter(errorOrElement => errorOrElement.isRight) match {
-        case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
-        case xorsWithoutErrors => Right(xorsWithoutErrors.head.getOrError)
-      }
+    findChildrenBy[T](className).map(_.head)
+
+  def findOnlyChildBy[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                                  manifest: Manifest[T]): HtmlCheckError Xor T =
+    findChildrenBy[T](className).flatMap {
+      case head :: Nil => Right(head)
+      case children => Left(MoreThanOneElementFound(children.size, getTagTypeFromManifest, className))
     }
 
   private def getTagTypeFromManifest(implicit manifest: Manifest[_]) =
