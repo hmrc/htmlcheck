@@ -35,6 +35,24 @@ object ElementId {
     }
 }
 
+case object Selected extends ElementAttribute {
+
+  val value = "selected"
+  type Selected = Selected.type
+
+  def apply(element: Element): Option[Selected] =
+    element.hasAttr("selected") match {
+      case false => None
+      case true => element.attr("selected") match {
+        case selected if selected == value => Some(Selected)
+        case "" => Some(Selected)
+        case _ => None
+      }
+    }
+
+}
+
+
 case class ElementValue(value: String) extends ElementAttribute
 
 object ElementValue {

@@ -28,7 +28,7 @@ case class Radio(protected val element: Element)
     with ElementProperties
     with ContainerElement {
 
-  lazy val selected: Boolean = element.attr("selected") == "selected"
+  lazy val selected: Boolean = Selected(element).isDefined
 }
 
 object Radio {
