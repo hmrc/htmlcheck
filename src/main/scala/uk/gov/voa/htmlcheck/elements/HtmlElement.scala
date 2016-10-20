@@ -41,6 +41,8 @@ trait ElementProperties {
 
   lazy val value: Option[ElementValue] = ElementValue(element)
 
+  lazy val text: Option[ElementText] = ElementText(element)
+
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =
     Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound(id))

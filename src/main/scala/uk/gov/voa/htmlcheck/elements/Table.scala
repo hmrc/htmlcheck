@@ -40,11 +40,7 @@ object Table {
 case class Caption(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object Caption {
 
@@ -72,11 +68,7 @@ object Colgroup {
 case class Col(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object Col {
 
@@ -146,11 +138,7 @@ object Tr {
 case class Th(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object Th {
 
@@ -164,11 +152,7 @@ object Th {
 case class Td(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object Td {
 

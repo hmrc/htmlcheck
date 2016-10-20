@@ -26,11 +26,7 @@ import scala.language.implicitConversions
 case class Span(elementId: Option[ElementId])(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object Span {
 

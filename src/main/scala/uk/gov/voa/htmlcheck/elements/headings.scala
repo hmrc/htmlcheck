@@ -26,11 +26,7 @@ import scala.language.implicitConversions
 case class H1(elementId: Option[ElementId])(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object H1 {
 
@@ -44,11 +40,7 @@ object H1 {
 case class H2(elementId: Option[ElementId])(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement {
-
-  lazy val text: String = element.text
-
-}
+    with ContainerElement
 
 object H2 {
 

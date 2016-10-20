@@ -20,19 +20,17 @@ import org.jsoup.nodes.Element
 
 import scala.annotation.tailrec
 
-case class ErrorElement(elementClass: Option[ElementClass],
-                        text: ElementText)
-                       (protected val element: Element)
+case class ErrorElement(protected val element: Element)
   extends HtmlElement
     with ElementProperties
 
 object ErrorElement {
 
-  def apply(element: Element): Option[ErrorElement] =
+  def from(element: Element): Option[ErrorElement] =
     if (element.tagName() != "span")
       None
     else
-      Some(ErrorElement(ElementClass(element), ElementText(element))(element))
+      Some(ErrorElement(element))
 
 }
 
@@ -49,7 +47,7 @@ trait ErrorElements {
   private def nextErrorIfPresent(maybeElement: Option[Element], errorElements: Seq[ErrorElement]): Seq[ErrorElement] =
     maybeElement match {
       case None => errorElements
-      case Some(element) => ErrorElement(element) match {
+      case Some(element) => ErrorElement.from(element) match {
         case None => errorElements
         case Some(nextError) => nextErrorIfPresent(Option(element.previousElementSibling()), errorElements :+ nextError)
       }
