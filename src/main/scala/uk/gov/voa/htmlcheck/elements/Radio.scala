@@ -17,34 +17,13 @@
 package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor
-import cats.data.Xor._
+import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class Select(protected val element: Element)
-  extends HtmlElement
-    with ElementProperties
-    with ContainerElement {
-
-  lazy val options: Xor[HtmlCheckError, Seq[SelectOption]] = findChildrenOfType[SelectOption]
-
-  lazy val selectedOptions: Xor[HtmlCheckError, Seq[SelectOption]] = options.map(_.filter(_.selected))
-
-}
-
-object Select {
-
-  implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
-    if (element.tagName() != "select")
-      Left(ElementWithIdOfWrongType(ElementId(element), "select", element.tagName()))
-    else
-      Right(Radio(element))
-
-}
-
-case class SelectOption(protected val element: Element)
+case class Radio(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ContainerElement {
@@ -52,11 +31,12 @@ case class SelectOption(protected val element: Element)
   lazy val selected: Boolean = element.attr("selected") == "selected"
 }
 
-object SelectOption {
+object Radio {
 
-  implicit def optionElementWrapper(element: Element): HtmlCheckError Xor SelectOption =
-    if (element.tagName() != "option")
-      Left(ElementWithIdOfWrongType(ElementId(element), "option", element.tagName()))
+  implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
+    if (element.tagName() != "radio")
+      Left(ElementWithIdOfWrongType(ElementId(element), "radio", element.tagName()))
     else
-      Right(SelectOption(element))
+      Right(Radio(element))
+
 }
