@@ -26,7 +26,6 @@ import scala.language.implicitConversions
 case class TextArea(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ErrorElements
 
 object TextArea {
 

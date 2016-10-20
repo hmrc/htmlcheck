@@ -26,8 +26,7 @@ import scala.language.implicitConversions
 case class Select(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement
-    with ErrorElements {
+    with ContainerElement {
 
   lazy val options: Xor[HtmlCheckError, Seq[SelectOption]] = findChildrenOfType[SelectOption]
 
