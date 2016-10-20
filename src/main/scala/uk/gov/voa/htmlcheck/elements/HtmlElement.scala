@@ -53,8 +53,8 @@ trait ContainerElement {
     Xor.fromOption(Option(element.children().first()), ElementOfTypeNotFound(getTagTypeFromManifest, Some("as first child")))
       .flatMap(elementWrapper)
 
-  def findDescendantById[T <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                          manifest: Manifest[T]): HtmlCheckError Xor T =
+  def findDescendantBy[T <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                        manifest: Manifest[T]): HtmlCheckError Xor T =
     Xor.fromOption(Option(element.getElementById(id.id)), ElementWithIdNotFound(id))
       .flatMap(elementWrapper)
 
@@ -78,8 +78,8 @@ trait ContainerElement {
       case children => Left(ElementOutOfBounds(getTagTypeFromManifest, children.size, index))
     }
 
-  def findChildrenByClass[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                                     manifest: Manifest[T]): HtmlCheckError Xor Seq[T] =
+  def findChildrenBy[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                                manifest: Manifest[T]): HtmlCheckError Xor Seq[T] =
     element.children.iterator().toSeq
       .filter(_.classNames().toSet.contains(className.name)) match {
       case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
@@ -91,8 +91,8 @@ trait ContainerElement {
       }
     }
 
-  def findFirstChildWithClass[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                                         manifest: Manifest[T]): HtmlCheckError Xor T =
+  def findFirstChildBy[T <: HtmlElement](className: ElementClass)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                                  manifest: Manifest[T]): HtmlCheckError Xor T =
     element.getElementsByClass(className.name).iterator().toSeq match {
       case Nil => Left(NoElementsOfClassFound(getTagTypeFromManifest, className))
       case elements => elements
