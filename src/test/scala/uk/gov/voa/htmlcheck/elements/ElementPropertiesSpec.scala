@@ -28,7 +28,7 @@ class ElementPropertiesSpec extends UnitSpec {
   "id" should {
 
     "return element's id if it has one" in new TestCase {
-      parent.id shouldBe Some(ElementId("div1"))
+      parent.id shouldBe Some(IdAttribute("div1"))
     }
 
     "return None if there's no id defined for the element" in {
@@ -41,23 +41,23 @@ class ElementPropertiesSpec extends UnitSpec {
   "nextSibling" should {
 
     "return ElementWithIdOfWrongType when there's no direct child sibling of the given type" in new TestCase {
-      val Left(error) = parent.findDescendantBy[TextArea](ElementId("1"))
+      val Left(error) = parent.findDescendantBy[TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementWithIdOfWrongType(Some(ElementId("p1")), "textarea", "p")
+      error shouldBe ElementWithIdOfWrongType(Some(IdAttribute("p1")), "textarea", "p")
     }
 
     "return ElementSiblingNotFound when an element is the last child" in new TestCase {
-      val Left(error) = parent.findDescendantBy[TextArea](ElementId("2"))
+      val Left(error) = parent.findDescendantBy[TextArea](IdAttribute("2"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementSiblingNotFound(Some(ElementId("2")))
+      error shouldBe ElementSiblingNotFound(Some(IdAttribute("2")))
     }
 
     "return child direct with the given id" in new TestCase {
-      parent.findDescendantBy[TextArea](ElementId("1"))
+      parent.findDescendantBy[TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[P])
-        .getOrError.elementId shouldBe Some(ElementId("p1"))
+        .getOrError.elementId shouldBe Some(IdAttribute("p1"))
     }
   }
 

@@ -23,7 +23,7 @@ import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class Ul(elementId: Option[ElementId])
+case class Ul(elementId: Option[IdAttribute])
              (protected val element: Element)
   extends HtmlElement
     with ElementProperties
@@ -33,12 +33,12 @@ object Ul {
 
   implicit def ulElementWrapper(element: Element): HtmlCheckError Xor Ul =
     if (element.tagName() != "ul")
-      Left(ElementWithIdOfWrongType(ElementId(element), "ul", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "ul", element.tagName()))
     else
-      Right(Ul(ElementId(element))(element))
+      Right(Ul(IdAttribute(element))(element))
 }
 
-case class Li(elementId: Option[ElementId])
+case class Li(elementId: Option[IdAttribute])
              (protected val element: Element)
   extends HtmlElement
     with ElementProperties
@@ -48,7 +48,7 @@ object Li {
 
   implicit def liElementWrapper(element: Element): HtmlCheckError Xor Li =
     if (element.tagName() != "li")
-      Left(ElementWithIdOfWrongType(ElementId(element), "li", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "li", element.tagName()))
     else
-      Right(Li(ElementId(element))(element))
+      Right(Li(IdAttribute(element))(element))
 }

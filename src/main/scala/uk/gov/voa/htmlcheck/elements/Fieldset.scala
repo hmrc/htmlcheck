@@ -32,7 +32,7 @@ object Fieldset {
 
   implicit def divElementWrapper(element: Element): HtmlCheckError Xor Legend =
     if (element.tagName() != "fieldset")
-      Left(ElementWithIdOfWrongType(ElementId(element), "fieldset", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "fieldset", element.tagName()))
     else
       Right(Legend(element))
 }

@@ -33,22 +33,26 @@ trait ElementProperties {
 
   self: HtmlElement =>
 
-  lazy val id: Option[ElementId] = ElementId(element)
+  lazy val id: Option[IdAttribute] = IdAttribute(element)
 
-  lazy val className: Option[ElementClass] = ElementClass(element)
+  lazy val name: Option[NameAttribute] = NameAttribute(element)
 
-  lazy val classNames: Set[ElementClass] = element.classNames().toSet[String].map(ElementClass.apply)
+  lazy val className: Option[ClassAttribute] = ClassAttribute(element)
 
-  lazy val value: Option[ElementValue] = ElementValue(element)
+  lazy val classNames: Set[ClassAttribute] = element.classNames().toSet[String].map(ClassAttribute.apply)
+
+  lazy val value: Option[ValueAttribute] = ValueAttribute(element)
 
   lazy val text: Option[ElementText] = ElementText(element)
+
+  def attribute(name: AttributeName): Option[GenericAttribute] = GenericAttribute(name, element)
 
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =
     Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound(id))
       .flatMap(elementWrapper)
 
-  override def toString = ElementId(element).map(_.toString)
+  override def toString = IdAttribute(element).map(_.toString)
     .orElse(Option(element.tagName))
     .getOrElse(getClass.getSimpleName)
 }
@@ -62,8 +66,8 @@ trait ContainerElement {
     Xor.fromOption(Option(element.children().first()), ElementOfTypeNotFound(getTagTypeFromManifest, Some("as first child")))
       .flatMap(elementWrapper)
 
-  def findDescendantBy[T <: HtmlElement](id: ElementId)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                        manifest: Manifest[T]): HtmlCheckError Xor T =
+  def findDescendantBy[T <: HtmlElement](id: IdAttribute)(implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                          manifest: Manifest[T]): HtmlCheckError Xor T =
     Xor.fromOption(Option(element.getElementById(id.value)), ElementWithIdNotFound(id))
       .flatMap(elementWrapper)
 
@@ -136,10 +140,10 @@ trait ContainerElement {
 
 object HtmlElement {
 
-  implicit val idPredicate: ElementId => Element => Boolean =
+  implicit val idPredicate: IdAttribute => Element => Boolean =
     id => _.id() == id.value
 
-  implicit val classPredicate: ElementClass => Element => Boolean =
+  implicit val classPredicate: ClassAttribute => Element => Boolean =
     className => _.classNames().toSet.contains(className.value)
 }
 

@@ -32,7 +32,7 @@ object Div {
 
   implicit def divElementWrapper(element: Element): HtmlCheckError Xor Div =
     if (element.tagName() != "div")
-      Left(ElementWithIdOfWrongType(ElementId(element), "div", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "div", element.tagName()))
     else
       Right(Div(element))
 }

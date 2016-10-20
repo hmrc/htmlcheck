@@ -16,7 +16,7 @@
 
 package uk.gov.voa.htmlcheck
 
-import uk.gov.voa.htmlcheck.elements.{ElementAttribute, ElementId}
+import uk.gov.voa.htmlcheck.elements.{ElementAttribute, IdAttribute}
 
 sealed trait HtmlCheckError extends Throwable {
   protected def message: String
@@ -24,15 +24,15 @@ sealed trait HtmlCheckError extends Throwable {
   override def getMessage: String = message
 }
 
-case class ElementWithIdNotFound(id: ElementId) extends HtmlCheckError {
+case class ElementWithIdNotFound(id: IdAttribute) extends HtmlCheckError {
   val message = s"Element with id=$id not found"
 }
 
-case class ElementSiblingNotFound(id: Option[ElementId]) extends HtmlCheckError {
+case class ElementSiblingNotFound(id: Option[IdAttribute]) extends HtmlCheckError {
   val message = s"Element with id=$id has no direct next sibling"
 }
 
-case class ElementWithIdOfWrongType(id: Option[ElementId], expectedType: String, actualType: String) extends HtmlCheckError {
+case class ElementWithIdOfWrongType(id: Option[IdAttribute], expectedType: String, actualType: String) extends HtmlCheckError {
   val message = s"Element with id=$id is of $actualType while $expectedType expected"
 }
 

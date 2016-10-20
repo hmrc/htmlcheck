@@ -38,7 +38,7 @@ object Select {
 
   implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
     if (element.tagName() != "select")
-      Left(ElementWithIdOfWrongType(ElementId(element), "select", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "select", element.tagName()))
     else
       Right(Radio(element))
 
@@ -49,14 +49,14 @@ case class SelectOption(protected val element: Element)
     with ElementProperties
     with ContainerElement {
 
-  lazy val selected: Boolean = Selected(element).isDefined
+  lazy val selected: Boolean = SelectedAttribute(element).isDefined
 }
 
 object SelectOption {
 
   implicit def optionElementWrapper(element: Element): HtmlCheckError Xor SelectOption =
     if (element.tagName() != "option")
-      Left(ElementWithIdOfWrongType(ElementId(element), "option", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "option", element.tagName()))
     else
       Right(SelectOption(element))
 }

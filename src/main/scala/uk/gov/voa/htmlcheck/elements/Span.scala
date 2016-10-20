@@ -23,7 +23,7 @@ import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class Span(elementId: Option[ElementId])(protected val element: Element)
+case class Span(elementId: Option[IdAttribute])(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ContainerElement
@@ -32,7 +32,7 @@ object Span {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Span =
     if (element.tagName() != "span")
-      Left(ElementWithIdOfWrongType(ElementId(element), "span", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "span", element.tagName()))
     else
-      Right(Span(ElementId(element))(element))
+      Right(Span(IdAttribute(element))(element))
 }

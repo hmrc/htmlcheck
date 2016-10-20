@@ -19,48 +19,83 @@ package uk.gov.voa.htmlcheck.elements
 import org.jsoup.nodes.Element
 
 trait ElementAttribute {
+  require(value.nonEmpty)
+
   def value: String
 
   override def toString = value
 }
 
-case class ElementId(value: String) extends ElementAttribute
+case class AttributeName(value: String) {
+  require(value.nonEmpty)
 
-object ElementId {
+  override def toString = value
+}
 
-  def apply(element: Element): Option[ElementId] =
-    element.id() match {
-      case "" => None
-      case id => Some(ElementId(id))
+case class GenericAttribute(name: AttributeName, value: String) extends ElementAttribute {
+  require(value.nonEmpty)
+
+  override def toString = value
+}
+
+object GenericAttribute {
+
+  def apply(name: AttributeName, element: Element): Option[GenericAttribute] =
+    element.hasAttr(name.value) match {
+      case false => None
+      case true => element.attr(name.value) match {
+        case "" => None
+        case value => Some(GenericAttribute(name, value))
+      }
     }
 }
 
-case object Selected extends ElementAttribute {
+case class IdAttribute(value: String) extends ElementAttribute
 
-  val value = "selected"
-  type Selected = Selected.type
+object IdAttribute {
 
-  def apply(element: Element): Option[Selected] =
+  def apply(element: Element): Option[IdAttribute] =
+    element.id() match {
+      case "" => None
+      case id => Some(IdAttribute(id))
+    }
+}
+
+case class NameAttribute(value: String) extends ElementAttribute
+
+object NameAttribute {
+
+  def apply(element: Element): Option[NameAttribute] =
+    element.attr("name") match {
+      case "" => None
+      case name => Some(NameAttribute(name))
+    }
+}
+
+case object SelectedAttribute extends ElementAttribute {
+
+  lazy val value = "selected"
+  type SelectedAttribute = SelectedAttribute.type
+
+  def apply(element: Element): Option[SelectedAttribute] =
     element.hasAttr("selected") match {
       case false => None
       case true => element.attr("selected") match {
-        case selected if selected == value => Some(Selected)
-        case "" => Some(Selected)
+        case selected if selected == value => Some(SelectedAttribute)
+        case "" => Some(SelectedAttribute)
         case _ => None
       }
     }
-
 }
 
+case class ValueAttribute(value: String) extends ElementAttribute
 
-case class ElementValue(value: String) extends ElementAttribute
+object ValueAttribute {
 
-object ElementValue {
-
-  def apply(element: Element): Option[ElementValue] =
+  def apply(element: Element): Option[ValueAttribute] =
     element.`val`() match {
       case "" => None
-      case value => Some(ElementValue(value))
+      case value => Some(ValueAttribute(value))
     }
 }
 
@@ -75,9 +110,9 @@ object ElementText {
     }
 }
 
-case class ElementClass(value: String) extends ElementAttribute
+case class ClassAttribute(value: String) extends ElementAttribute
 
-object ElementClass {
+object ClassAttribute {
 
-  def apply(element: Element): Option[ElementClass] = Some(ElementClass(element.className()))
+  def apply(element: Element): Option[ClassAttribute] = Some(ClassAttribute(element.className()))
 }

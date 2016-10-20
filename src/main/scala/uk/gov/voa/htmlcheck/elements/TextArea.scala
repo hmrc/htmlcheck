@@ -31,7 +31,7 @@ object TextArea {
 
   implicit def textAreaElementWrapper(element: Element): HtmlCheckError Xor TextArea =
     if (element.tagName() != "textarea")
-      Left(ElementWithIdOfWrongType(ElementId(element), "textarea", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "textarea", element.tagName()))
     else
       Right(TextArea(element))
 }

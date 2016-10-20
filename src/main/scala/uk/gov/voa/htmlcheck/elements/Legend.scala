@@ -32,7 +32,7 @@ object Legend {
 
   implicit def divElementWrapper(element: Element): HtmlCheckError Xor Legend =
     if (element.tagName() != "legend")
-      Left(ElementWithIdOfWrongType(ElementId(element), "legend", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "legend", element.tagName()))
     else
       Right(Legend(element))
 }

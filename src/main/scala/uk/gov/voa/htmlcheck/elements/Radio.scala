@@ -28,14 +28,14 @@ case class Radio(protected val element: Element)
     with ElementProperties
     with ContainerElement {
 
-  lazy val selected: Boolean = Selected(element).isDefined
+  lazy val selected: Boolean = SelectedAttribute(element).isDefined
 }
 
 object Radio {
 
   implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
     if (element.tagName() != "radio")
-      Left(ElementWithIdOfWrongType(ElementId(element), "radio", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "radio", element.tagName()))
     else
       Right(Radio(element))
 

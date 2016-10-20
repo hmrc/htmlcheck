@@ -23,7 +23,7 @@ import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class P(elementId: Option[ElementId])(protected val element: Element)
+case class P(elementId: Option[IdAttribute])(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ContainerElement
@@ -32,7 +32,7 @@ object P {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor P =
     if (element.tagName() != "p")
-      Left(ElementWithIdOfWrongType(ElementId(element), "p", element.tagName()))
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "p", element.tagName()))
     else
-      Right(P(ElementId(element))(element))
+      Right(P(IdAttribute(element))(element))
 }
