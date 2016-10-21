@@ -17,37 +17,39 @@
 package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor
-import cats.data.Xor._
+import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.elements.ElementAttribute._
+import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
+import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
 import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class H1(protected val element: Element)
+case class A(protected val element: Element)
   extends HtmlElement
     with ElementProperties
-    with ContainerElement
+    with ContainerElement {
 
-object H1 {
-
-  implicit def elementWrapper(element: Element): HtmlCheckError Xor H1 =
-    if (element.tagName() != "h1")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "h1", element.tagName()))
-    else
-      Right(H1(element))
+  lazy val href = HrefAttribute(element)
 }
 
-case class H2(protected val element: Element)
-  extends HtmlElement
-    with ElementProperties
-    with ContainerElement
+object A {
 
-object H2 {
-
-  implicit def elementWrapper(element: Element): HtmlCheckError Xor H2 =
-    if (element.tagName() != "h2")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "h2", element.tagName()))
+  implicit def elementWrapper(element: Element): HtmlCheckError Xor A =
+    if (element.tagName() != "a")
+      Left(ElementWithIdOfWrongType(IdAttribute(element), "a", element.tagName()))
     else
-      Right(H2(element))
+      Right(A(element))
+
+  case class HrefAttribute(value: String) extends ElementAttribute
+
+  object HrefAttribute {
+
+    def apply(element: Element): Option[HrefAttribute] =
+      element.attr("href") match {
+        case "" => None
+        case value => Some(HrefAttribute(value))
+      }
+  }
+
 }
