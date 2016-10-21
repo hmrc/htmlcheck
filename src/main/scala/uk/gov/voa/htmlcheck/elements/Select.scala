@@ -45,10 +45,7 @@ object Select {
       Right(Select(element))
 }
 
-case class SelectOption(protected val element: Element)
-  extends HtmlElement
-    with ElementProperties
-    with ContainerElement {
+case class SelectOption(protected val element: Element) extends Input {
 
   lazy val selected: Boolean = SelectedAttribute(element).isDefined
 }
