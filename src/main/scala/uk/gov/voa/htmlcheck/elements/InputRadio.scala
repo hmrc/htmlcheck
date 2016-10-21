@@ -25,10 +25,7 @@ import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class InputRadio(protected val element: Element)
-  extends HtmlElement
-    with ElementProperties
-    with ContainerElement {
+case class InputRadio(protected val element: Element) extends Input {
 
   lazy val checked: Boolean = CheckedAttribute(element).isDefined
 }

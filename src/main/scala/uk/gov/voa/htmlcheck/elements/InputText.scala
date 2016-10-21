@@ -24,10 +24,7 @@ import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class InputText(protected val element: Element)
-  extends HtmlElement
-    with ElementProperties
-    with ContainerElement
+case class InputText(protected val element: Element) extends Input
 
 object InputText {
 
