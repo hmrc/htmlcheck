@@ -38,7 +38,7 @@ case class ElementOfTypeNotFound(tagType: String, maybeMessage: Option[String] =
 }
 
 case class NoElementsFound(tagType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
-  val message = s"Elements of type=$tagType${maybeAttribute.map(attribute => s"having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} not found"
+  val message = s"Elements of type=$tagType${maybeAttribute.map(attribute => s" having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} not found"
 }
 
 object NoElementsFound {
@@ -51,7 +51,7 @@ object NoElementsFound {
 }
 
 case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
-  val message = s"There are $numberOfFoundElements elements of type=$tagType${maybeAttribute.map(attribute => s"having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} found while one was expected"
+  val message = s"There are $numberOfFoundElements elements of type=$tagType${maybeAttribute.map(attribute => s" having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} found while one was expected"
 }
 
 object MoreThanOneElementFound {
