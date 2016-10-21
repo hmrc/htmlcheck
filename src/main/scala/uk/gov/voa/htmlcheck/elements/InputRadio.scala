@@ -20,12 +20,12 @@ import cats.data.Xor
 import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
-import uk.gov.voa.htmlcheck.elements.Radio.CheckedAttribute
+import uk.gov.voa.htmlcheck.elements.InputRadio.CheckedAttribute
 import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class Radio(protected val element: Element)
+case class InputRadio(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ContainerElement {
@@ -33,7 +33,7 @@ case class Radio(protected val element: Element)
   lazy val checked: Boolean = CheckedAttribute(element).isDefined
 }
 
-object Radio {
+object InputRadio {
 
   private case object CheckedAttribute extends ElementAttribute {
 
@@ -51,10 +51,10 @@ object Radio {
       }
   }
 
-  implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
-    if (element.tagName() != "radio")
-      Left(ElementOfWrongType("radio", element.tagName(), IdAttribute(element)))
+  implicit def elementWrapper(element: Element): HtmlCheckError Xor InputRadio =
+    if (element.tagName() != "input" || !TypeAttribute(element).exists(_.value == "radio"))
+      Left(ElementOfWrongType("input-radio", s"${element.tagName()}${TypeAttribute(element).map(t => s"-$t").getOrElse("")}", IdAttribute(element)))
     else
-      Right(Radio(element))
+      Right(InputRadio(element))
 
 }

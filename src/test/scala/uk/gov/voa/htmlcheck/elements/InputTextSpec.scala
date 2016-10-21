@@ -16,38 +16,47 @@
 
 package uk.gov.voa.htmlcheck.elements
 
+import cats.data.Xor._
 import org.jsoup.Jsoup
+import uk.gov.voa.htmlcheck.ElementOfWrongType
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
-class RadioSpec extends UnitSpec {
+class InputTextSpec extends UnitSpec {
 
-  "checked" should {
+  "elementWrapper" should {
 
-    "return true if there is a 'checked' property with value of checked" in {
+    "successfully instantiate from an 'input' of type text html tag" in {
       val snippet =
         """
-          |<input type="radio" checked="checked">
+          |<input type="text">
           |""".stripMargin
 
-      Radio(Jsoup.parse(snippet).body().children().first()).checked shouldBe true
+      val element = Jsoup.parse(snippet).body().children().first()
+
+      InputText.elementWrapper(element) shouldBe Right(InputText(element))
     }
 
-    "return true if there is just a 'checked' property without value" in {
+    "return ElementWithIdOfWrongType when instantiated from a non 'input' html tag" in {
       val snippet =
         """
-          |<input type="radio" checked>
+          |<div />
           |""".stripMargin
 
-      Radio(Jsoup.parse(snippet).body().children().first()).checked shouldBe true
+      val element = Jsoup.parse(snippet).body().children().first()
+
+      InputText.elementWrapper(element) shouldBe Left(ElementOfWrongType("input-text", "div", None))
     }
 
-    "return false if there is no 'checked' property" in {
+    "return ElementWithIdOfWrongType when instantiated from an 'input' of non text html tag" in {
       val snippet =
         """
           |<input type="radio">
           |""".stripMargin
 
-      Radio(Jsoup.parse(snippet).body().children().first()).checked shouldBe false
+      val element = Jsoup.parse(snippet).body().children().first()
+
+      InputText.elementWrapper(element) shouldBe Left(ElementOfWrongType("input-text", "input-radio", None))
     }
   }
+
 }
