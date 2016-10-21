@@ -42,7 +42,7 @@ trait ElementProperties {
 
   lazy val classNames: Set[ClassAttribute] = element.classNames().toSet[String].map(ClassAttribute.apply)
 
-  lazy val text: Option[ElementText] = ElementText(element)
+  lazy val text: String = element.text()
 
   def attribute(name: AttributeName): Option[GenericAttribute] = GenericAttribute(name, element)
 

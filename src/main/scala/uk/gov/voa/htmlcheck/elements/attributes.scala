@@ -107,17 +107,6 @@ object ElementAttribute {
       }
   }
 
-  case class ElementText(value: String) extends ElementAttribute
-
-  object ElementText {
-
-    def apply(element: Element): Option[ElementText] =
-      element.text() match {
-        case "" => None
-        case value => Some(ElementText(value))
-      }
-  }
-
   case class ClassAttribute(value: String) extends ElementAttribute
 
   object ClassAttribute {
