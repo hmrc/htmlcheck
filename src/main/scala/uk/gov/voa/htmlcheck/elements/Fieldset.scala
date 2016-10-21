@@ -20,7 +20,7 @@ import cats.data.Xor
 import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -33,7 +33,7 @@ object Fieldset {
 
   implicit def fieldsetElementWrapper(element: Element): HtmlCheckError Xor Fieldset =
     if (element.tagName() != "fieldset")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "fieldset", element.tagName()))
+      Left(ElementOfWrongType("fieldset", element.tagName(), IdAttribute(element)))
     else
       Right(Fieldset(element))
 }

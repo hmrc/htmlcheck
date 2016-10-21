@@ -21,7 +21,7 @@ import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.elements.Radio.CheckedAttribute
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -53,7 +53,7 @@ object Radio {
 
   implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Radio =
     if (element.tagName() != "radio")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "radio", element.tagName()))
+      Left(ElementOfWrongType("radio", element.tagName(), IdAttribute(element)))
     else
       Right(Radio(element))
 

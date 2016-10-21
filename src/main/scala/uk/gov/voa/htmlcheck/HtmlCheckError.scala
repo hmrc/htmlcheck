@@ -25,16 +25,12 @@ sealed trait HtmlCheckError extends Throwable {
   override def getMessage: String = message
 }
 
-case class ElementWithIdNotFound(id: IdAttribute) extends HtmlCheckError {
-  val message = s"Element with id=$id not found"
-}
-
 case class ElementSiblingNotFound(id: Option[IdAttribute]) extends HtmlCheckError {
   val message = s"Element with id=$id has no direct next sibling"
 }
 
-case class ElementWithIdOfWrongType(id: Option[IdAttribute], expectedType: String, actualType: String) extends HtmlCheckError {
-  val message = s"Element with id=$id is of $actualType while $expectedType expected"
+case class ElementOfWrongType(expectedType: String, actualType: String, maybeId: Option[IdAttribute]) extends HtmlCheckError {
+  val message = s"Found element of $actualType while $expectedType expected${maybeId.map(id => s" id=$id").getOrElse("")}"
 }
 
 case class ElementOfTypeNotFound(tagType: String, maybeMessage: Option[String] = None) extends HtmlCheckError {

@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{ElementSiblingNotFound, ElementWithIdOfWrongType}
+import uk.gov.voa.htmlcheck.{ElementSiblingNotFound, ElementOfWrongType}
 
 class ElementPropertiesSpec extends UnitSpec {
 
@@ -45,7 +45,7 @@ class ElementPropertiesSpec extends UnitSpec {
       val Left(error) = parent.findDescendantBy[TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementWithIdOfWrongType(Some(IdAttribute("p1")), "textarea", "p")
+      error shouldBe ElementOfWrongType("textarea", "p", Some(IdAttribute("p1")))
     }
 
     "return ElementSiblingNotFound when an element is the last child" in new TestCase {

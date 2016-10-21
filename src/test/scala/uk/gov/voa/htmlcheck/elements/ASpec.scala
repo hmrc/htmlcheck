@@ -18,7 +18,7 @@ package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor._
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.ElementWithIdOfWrongType
+import uk.gov.voa.htmlcheck.ElementOfWrongType
 import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
@@ -45,7 +45,7 @@ class ASpec extends UnitSpec {
 
       val element = Jsoup.parse(snippet).body().children().first()
 
-      A.elementWrapper(element) shouldBe Left(ElementWithIdOfWrongType(None, "a", "div"))
+      A.elementWrapper(element) shouldBe Left(ElementOfWrongType("a", "div", None))
     }
   }
 

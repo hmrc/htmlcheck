@@ -21,7 +21,7 @@ import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.elements.SelectOption.SelectedAttribute
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -40,7 +40,7 @@ object Select {
 
   implicit def selectElementWrapper(element: Element): HtmlCheckError Xor Select =
     if (element.tagName() != "select")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "select", element.tagName()))
+      Left(ElementOfWrongType("select", element.tagName(), IdAttribute(element)))
     else
       Right(Select(element))
 }
@@ -73,7 +73,7 @@ object SelectOption {
 
   implicit def optionElementWrapper(element: Element): HtmlCheckError Xor SelectOption =
     if (element.tagName() != "option")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "option", element.tagName()))
+      Left(ElementOfWrongType("option", element.tagName(), IdAttribute(element)))
     else
       Right(SelectOption(element))
 }

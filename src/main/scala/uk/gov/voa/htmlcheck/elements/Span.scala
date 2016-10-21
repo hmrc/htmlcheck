@@ -20,7 +20,7 @@ import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -33,7 +33,7 @@ object Span {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Span =
     if (element.tagName() != "span")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "span", element.tagName()))
+      Left(ElementOfWrongType("span", element.tagName(), IdAttribute(element)))
     else
       Right(Span(IdAttribute(element))(element))
 }

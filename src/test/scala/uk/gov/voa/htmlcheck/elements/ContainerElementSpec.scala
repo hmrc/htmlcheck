@@ -36,11 +36,53 @@ class ContainerElementSpec extends UnitSpec {
 
     "return HtmlCheckError when the first child is of different type" in new TestCase {
       val Left(error) = parent.firstChild[Li]
-      error shouldBe a[ElementWithIdOfWrongType]
+      error shouldBe a[ElementOfWrongType]
     }
 
     "return the first child of the requested type" in new TestCase {
       parent.firstChild[TextArea].getOrError.id shouldBe Some(IdAttribute("1"))
+    }
+  }
+
+  "onlyChild" should {
+    val snippet =
+      """<div id="div1" />
+        |<div id="div2">
+        | <p id="p"></p>
+        |</div>
+        |<div id="div3">
+        | <p id="p1"></p>
+        | <p id="p1"></p>
+        |</div>
+        |"""
+
+    "return ElementOfTypeNotFound when there are no children" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](IdAttribute("div1")).getOrError
+
+      div.onlyChild[Div] shouldBe Left(ElementOfTypeNotFound("div", Some("as the only child")))
+    }
+
+    "return ElementOfWrongType when the only child is of different type" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](IdAttribute("div2")).getOrError
+
+      div.onlyChild[Div] shouldBe Left(ElementOfWrongType("div", "p", Some(IdAttribute("p"))))
+
+    }
+
+    "return HtmlCheckError when there is more than one child even of different type" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](IdAttribute("div3")).getOrError
+
+      div.onlyChild[P] shouldBe Left(MoreThanOneElementFound(2, "p"))
+    }
+
+    "return the child of the requested type" in new TestCase {
+
+      val div = html(snippet).findDescendantBy[Div](IdAttribute("div2")).getOrError
+
+      div.onlyChild[P].getOrError.id shouldBe Some(IdAttribute("p"))
     }
   }
 

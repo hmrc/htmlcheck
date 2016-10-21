@@ -67,9 +67,17 @@ trait ContainerElement {
     Xor.fromOption(Option(element.children().first()), ElementOfTypeNotFound(getTagTypeFromManifest, Some("as first child")))
       .flatMap(elementWrapper)
 
+  def onlyChild[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                  manifest: Manifest[T]): HtmlCheckError Xor T =
+    element.children().toSeq match {
+      case elements if elements.isEmpty => Left(ElementOfTypeNotFound(getTagTypeFromManifest, Some("as the only child")))
+      case elements if elements.size > 1 => Left(MoreThanOneElementFound(elements.size, getTagTypeFromManifest))
+      case elements => elementWrapper(elements.head)
+    }
+
   def findDescendantBy[T <: HtmlElement](id: IdAttribute)(implicit elementWrapper: Element => HtmlCheckError Xor T,
                                                           manifest: Manifest[T]): HtmlCheckError Xor T =
-    Xor.fromOption(Option(element.getElementById(id.value)), ElementWithIdNotFound(id))
+    Xor.fromOption(Option(element.getElementById(id.value)), ElementOfWrongType(getTagTypeFromManifest, element.tagName(), Some(id)))
       .flatMap(elementWrapper)
 
   def findChildrenOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
@@ -85,7 +93,7 @@ trait ContainerElement {
     findChildrenOfType map (_.head)
 
   def findOnlyChildOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                             manifest: Manifest[T]): HtmlCheckError Xor T =
+                                            manifest: Manifest[T]): HtmlCheckError Xor T =
     findChildrenOfType flatMap {
       case head :: Nil => Right(head)
       case children => Left(MoreThanOneElementFound(children.size, getTagTypeFromManifest))
@@ -99,22 +107,22 @@ trait ContainerElement {
     }
 
   def findChildrenBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)(implicit filteringPredicate: AT => Element => Boolean,
-                                                                            elementWrapper: Element => HtmlCheckError Xor T,
-                                                                            manifest: Manifest[T]): HtmlCheckError Xor Seq[T] = {
+                                                                              elementWrapper: Element => HtmlCheckError Xor T,
+                                                                              manifest: Manifest[T]): HtmlCheckError Xor Seq[T] = {
     implicit val contextualAttribute: Option[ElementAttribute] = Some(attribute)
 
     findChildrenMatching(filteringPredicate(attribute)).convertThemTo[T]
   }
 
   def findFirstChildBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)
-                                                               (implicit filteringPredicate: AT => Element => Boolean,
-                                                                elementWrapper: Element => HtmlCheckError Xor T,
-                                                                manifest: Manifest[T]): HtmlCheckError Xor T =
+                                                                (implicit filteringPredicate: AT => Element => Boolean,
+                                                                 elementWrapper: Element => HtmlCheckError Xor T,
+                                                                 manifest: Manifest[T]): HtmlCheckError Xor T =
     findChildrenBy[AT, T](attribute).map(_.head)
 
   def findOnlyChildBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)(implicit filteringPredicate: AT => Element => Boolean,
-                                                                             elementWrapper: Element => HtmlCheckError Xor T,
-                                                                             manifest: Manifest[T]): HtmlCheckError Xor T =
+                                                                               elementWrapper: Element => HtmlCheckError Xor T,
+                                                                               manifest: Manifest[T]): HtmlCheckError Xor T =
     findChildrenBy[AT, T](attribute).flatMap {
       case head :: Nil => Right(head)
       case children => Left(MoreThanOneElementFound(children.size, getTagTypeFromManifest, attribute))
@@ -124,7 +132,7 @@ trait ContainerElement {
     element.children.iterator().toSeq
       .filter(predicate)
 
-  private implicit class ElementOps(elements: Seq[Element]) {
+  private implicit class ElementsOps(elements: Seq[Element]) {
 
     def convertThemTo[T <: HtmlElement](implicit elementAttribute: Option[ElementAttribute],
                                         elementWrapper: Element => HtmlCheckError Xor T,

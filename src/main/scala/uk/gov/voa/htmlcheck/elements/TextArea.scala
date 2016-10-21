@@ -20,7 +20,7 @@ import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -32,7 +32,7 @@ object TextArea {
 
   implicit def textAreaElementWrapper(element: Element): HtmlCheckError Xor TextArea =
     if (element.tagName() != "textarea")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "textarea", element.tagName()))
+      Left(ElementOfWrongType("textarea", element.tagName(), IdAttribute(element)))
     else
       Right(TextArea(element))
 }

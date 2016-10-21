@@ -21,7 +21,7 @@ import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
 import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -37,7 +37,7 @@ object A {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor A =
     if (element.tagName() != "a")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "a", element.tagName()))
+      Left(ElementOfWrongType("a", element.tagName(), IdAttribute(element)))
     else
       Right(A(element))
 

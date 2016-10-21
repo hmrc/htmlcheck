@@ -20,7 +20,7 @@ import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
-import uk.gov.voa.htmlcheck.{ElementWithIdOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -33,7 +33,7 @@ object Table {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Table =
     if (element.tagName() != "table")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "table", element.tagName()))
+      Left(ElementOfWrongType("table", element.tagName(), IdAttribute(element)))
     else
       Right(Table(element))
 }
@@ -47,7 +47,7 @@ object Caption {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Caption =
     if (element.tagName() != "caption")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "caption", element.tagName()))
+      Left(ElementOfWrongType("caption", element.tagName(), IdAttribute(element)))
     else
       Right(Caption(element))
 }
@@ -61,7 +61,7 @@ object Colgroup {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Colgroup =
     if (element.tagName() != "colgroup")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "colgroup", element.tagName()))
+      Left(ElementOfWrongType("colgroup", element.tagName(), IdAttribute(element)))
     else
       Right(Colgroup(element))
 }
@@ -75,7 +75,7 @@ object Col {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Col =
     if (element.tagName() != "col")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "col", element.tagName()))
+      Left(ElementOfWrongType("col", element.tagName(), IdAttribute(element)))
     else
       Right(Col(element))
 }
@@ -89,7 +89,7 @@ object Thead {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Thead =
     if (element.tagName() != "thead")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "thead", element.tagName()))
+      Left(ElementOfWrongType("thead", element.tagName(), IdAttribute(element)))
     else
       Right(Thead(element))
 }
@@ -103,7 +103,7 @@ object Tbody {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Tbody =
     if (element.tagName() != "tbody")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "tbody", element.tagName()))
+      Left(ElementOfWrongType("tbody", element.tagName(), IdAttribute(element)))
     else
       Right(Tbody(element))
 }
@@ -117,7 +117,7 @@ object Tfoot {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Tfoot =
     if (element.tagName() != "tfoot")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "tfoot", element.tagName()))
+      Left(ElementOfWrongType("tfoot", element.tagName(), IdAttribute(element)))
     else
       Right(Tfoot(element))
 }
@@ -131,7 +131,7 @@ object Tr {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Tr =
     if (element.tagName() != "tr")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "tr", element.tagName()))
+      Left(ElementOfWrongType("tr", element.tagName(), IdAttribute(element)))
     else
       Right(Tr(element))
 }
@@ -145,7 +145,7 @@ object Th {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Th =
     if (element.tagName() != "th")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "th", element.tagName()))
+      Left(ElementOfWrongType("th", element.tagName(), IdAttribute(element)))
     else
       Right(Th(element))
 }
@@ -159,7 +159,7 @@ object Td {
 
   implicit def elementWrapper(element: Element): HtmlCheckError Xor Td =
     if (element.tagName() != "td")
-      Left(ElementWithIdOfWrongType(IdAttribute(element), "td", element.tagName()))
+      Left(ElementOfWrongType("td", element.tagName(), IdAttribute(element)))
     else
       Right(Td(element))
 }
