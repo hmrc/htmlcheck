@@ -18,8 +18,8 @@ package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor
 import cats.data.Xor._
+import cats.kernel.Semigroup
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.Html._
 import uk.gov.voa.htmlcheck._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 
@@ -132,18 +132,29 @@ trait ContainerElement {
 
   private implicit class ElementsOps(elements: Seq[Element]) {
 
+    private implicit def elementXorsSemigroup[T <: HtmlElement] = new Semigroup[Seq[T]] {
+      def combine(x: Seq[T], y: Seq[T]): Seq[T] = x ++ y
+    }
+
     def convertThemTo[T <: HtmlElement](implicit elementAttribute: Option[ElementAttribute],
                                         elementWrapper: Element => HtmlCheckError Xor T,
                                         manifest: Manifest[T]): HtmlCheckError Xor Seq[T] =
       elements match {
-        case Nil => Left(NoElementsFound(getTagTypeFromManifest, elementAttribute))
+        case Nil =>
+          Left(NoElementsFound(getTagTypeFromManifest, elementAttribute))
         case elmnts => elmnts
           .map(elementWrapper)
-          .filter(errorOrElement => errorOrElement.isRight) match {
-          case Nil => Left(NoElementsFound(getTagTypeFromManifest, elementAttribute))
-          case xorsWithoutErrors => Right(xorsWithoutErrors.foldLeft(Seq.empty[T])((foundChildren, item) => foundChildren :+ item.getOrError))
+          .filter(_.isRight) match {
+          case Nil =>
+            Left(NoElementsFound(getTagTypeFromManifest, elementAttribute))
+          case rightsOfConvertedElements =>
+            rightsOfConvertedElements.map(elementIntoSeq).reduce(_ combine _)
         }
       }
+
+    private def elementIntoSeq[T <: HtmlElement](xor: HtmlCheckError Xor T): HtmlCheckError Xor Seq[T] =
+      xor.map(element => Seq(element))
+
   }
 
   private def getTagTypeFromManifest(implicit manifest: Manifest[_]) =
@@ -153,10 +164,17 @@ trait ContainerElement {
 
 object HtmlElement {
 
-  implicit val idPredicate: IdAttribute => Element => Boolean =
-    id => _.id() == id.value
+  object Implicits extends Implicits
 
-  implicit val classPredicate: ClassAttribute => Element => Boolean =
-    className => _.classNames().toSet.contains(className.value)
+  trait Implicits {
+
+    implicit val idPredicate: IdAttribute => Element => Boolean =
+      id => _.id() == id.value
+
+    implicit val classPredicate: ClassAttribute => Element => Boolean =
+      className => _.classNames().toSet.contains(className.value)
+
+  }
+
 }
 

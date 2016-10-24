@@ -19,10 +19,9 @@ package uk.gov.voa.htmlcheck.elements
 import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.Html._
-import uk.gov.voa.htmlcheck.{MoreThanOneElementFound, _}
+import uk.gov.voa.htmlcheck.Html.Implicits._
+import uk.gov.voa.htmlcheck._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
-import uk.gov.voa.htmlcheck.elements.HtmlElement._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
 class ContainerElementSpec extends UnitSpec {

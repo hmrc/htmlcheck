@@ -19,10 +19,10 @@ package uk.gov.voa.htmlcheck.elements
 import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.Html._
+import uk.gov.voa.htmlcheck.Html.Implicits._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{ElementSiblingNotFound, ElementOfWrongType}
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, ElementSiblingNotFound}
 
 class ElementPropertiesSpec extends UnitSpec {
 

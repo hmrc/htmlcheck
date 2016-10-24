@@ -39,17 +39,22 @@ case class Html(body: String)
 
 object Html {
 
-  implicit class ContentWrapper(content: {def body: String}) {
+  object Implicits extends Implicits
 
-    val asHtml = Html(content.body)
-  }
+  trait Implicits extends HtmlElement.Implicits {
 
-  implicit def convertToHtml(html: {def body: String}): Html = Html(html.body)
+    implicit class ContentWrapper(content: {def body: String}) {
+      val asHtml = Html(content.body)
+    }
 
-  implicit def addXorOps[E](xor: Xor[HtmlCheckError, E]): XorOps[E] = new XorOps[E](xor)
+    implicit def convertToHtml(html: {def body: String}): Html = Html(html.body)
 
-  class XorOps[E](xor: Xor[HtmlCheckError, E]) {
-    def getOrError = xor.valueOr(error => throw error)
+    implicit def addXorOps[E](xor: Xor[HtmlCheckError, E]): XorOps[E] = new XorOps[E](xor)
+
+    class XorOps[E](xor: Xor[HtmlCheckError, E]) {
+      def getOrError = xor.valueOr(error => throw error)
+    }
+
   }
 
 }
