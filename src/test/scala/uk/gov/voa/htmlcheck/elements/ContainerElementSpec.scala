@@ -110,9 +110,9 @@ class ContainerElementSpec extends UnitSpec {
 
     "return HtmlCheckError when no descendant found with the given class name" in new TestCase {
 
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
+      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div]("div1").getOrError
 
-      div.findOnlyDescendantBy[ClassAttribute, Div](ClassAttribute("invalid-class")) shouldBe Left(ElementOfWrongType("div", "div", Some(ClassAttribute("invalid-class"))))
+      div.findOnlyDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(ElementOfWrongType("div", "div", Some(ClassAttribute("invalid-class"))))
     }
 
     "return HtmlCheckError when more than one descendant found with the given class name" in new TestCase {

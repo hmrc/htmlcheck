@@ -19,15 +19,16 @@ package uk.gov.voa.htmlcheck.elements
 import org.scalacheck.Gen
 import org.scalatest.prop.PropertyChecks
 import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
+import uk.gov.voa.htmlcheck.elements.ElementAttribute.Implicits._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
+import uk.gov.voa.htmlcheck.tooling.generators.GeneratorOf
 
 class ElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
 
-  import ElementAttribute.Implicits._
 
   private val attributes = for {
-    value <- Gen.listOfN(Gen.chooseNum(1, 20).sample.get, Gen.alphaChar).map(_.mkString(""))
+    value <- GeneratorOf.nonEmptyString
     attribute <- Gen.oneOf(Seq(
       GenericAttribute(AttributeName(s"attribute-$value"), value),
       IdAttribute(s"id-$value"),
@@ -54,4 +55,30 @@ class ElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
     }
 
   }
+}
+
+class ImplicitSpec extends UnitSpec {
+
+  "stringToClassAttributeWrapper" should {
+
+    "convert a String into a ClassAttribute when needed" in {
+      val sample = GeneratorOf.nonEmptyString.sample.get
+
+      val value: ClassAttribute = sample
+
+      value.value shouldBe sample
+    }
+  }
+
+  "stringToIdAttributeWrapper" should {
+
+    "convert a String into an IdAttribute when needed" in {
+      val sample = GeneratorOf.nonEmptyString.sample.get
+
+      val value: IdAttribute = sample
+
+      value.value shouldBe sample
+    }
+  }
+
 }

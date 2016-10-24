@@ -46,7 +46,12 @@ object ElementAttribute {
       }
     }
 
+    implicit def stringToClassAttributeWrapper(className: String): ClassAttribute = ClassAttribute(className)
+
+    implicit def stringToIdAttributeWrapper(id: String): IdAttribute = IdAttribute(id)
+
   }
+
 
   case class GenericAttribute(name: AttributeName, value: String) extends ElementAttribute {
     require(value.nonEmpty)
