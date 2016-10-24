@@ -29,8 +29,8 @@ case class ElementSiblingNotFound(id: Option[IdAttribute]) extends HtmlCheckErro
   val message = s"Element with id=$id has no direct next sibling"
 }
 
-case class ElementOfWrongType(expectedType: String, actualType: String, maybeId: Option[IdAttribute]) extends HtmlCheckError {
-  val message = s"Found element of $actualType while $expectedType expected${maybeId.map(id => s" id=$id").getOrElse("")}"
+case class ElementOfWrongType(expectedType: String, actualType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
+  val message = s"Found element of $actualType while $expectedType expected${maybeAttribute.map(attribute => s" ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")}"
 }
 
 case class ElementOfTypeNotFound(tagType: String, maybeMessage: Option[String] = None) extends HtmlCheckError {

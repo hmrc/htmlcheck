@@ -73,10 +73,14 @@ trait ContainerElement {
       case elements => elementWrapper(elements.head)
     }
 
-  def findDescendantBy[T <: HtmlElement](id: IdAttribute)(implicit elementWrapper: Element => HtmlCheckError Xor T,
-                                                          manifest: Manifest[T]): HtmlCheckError Xor T =
-    Xor.fromOption(Option(element.getElementById(id.value)), ElementOfWrongType(getTagTypeFromManifest, element.tagName(), Some(id)))
-      .flatMap(elementWrapper)
+  def findOnlyDescendantBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)(implicit findDescendantsBy: AT => Element => Seq[Element],
+                                                                                    elementWrapper: Element => HtmlCheckError Xor T,
+                                                                                    manifest: Manifest[T]): HtmlCheckError Xor T =
+    findDescendantsBy(attribute)(element).filter(_ != null) match {
+      case elements if elements.isEmpty => Left(ElementOfWrongType(getTagTypeFromManifest, element.tagName(), Some(attribute)))
+      case elements if elements.size == 1 => elementWrapper(elements.head)
+      case elements => Left(MoreThanOneElementFound(elements.size, getTagTypeFromManifest, Some(attribute)))
+    }
 
   def findChildrenOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                            manifest: Manifest[T]): HtmlCheckError Xor Seq[T] = {
@@ -174,6 +178,11 @@ object HtmlElement {
     implicit val classPredicate: ClassAttribute => Element => Boolean =
       className => _.classNames().toSet.contains(className.value)
 
+    implicit val descendantByIdFinder: IdAttribute => Element => Seq[Element] =
+      id => element => Seq(element.getElementById(id.value))
+
+    implicit val descendantByClassFinder: ClassAttribute  => Element => Seq[Element] =
+      className => element => element.getElementsByClass(className.value).iterator().toSeq
   }
 
 }

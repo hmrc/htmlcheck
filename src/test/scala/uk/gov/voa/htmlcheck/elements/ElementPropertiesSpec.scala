@@ -42,21 +42,21 @@ class ElementPropertiesSpec extends UnitSpec {
   "nextSibling" should {
 
     "return ElementWithIdOfWrongType when there's no direct child sibling of the given type" in new TestCase {
-      val Left(error) = parent.findDescendantBy[TextArea](IdAttribute("1"))
+      val Left(error) = parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[TextArea])
 
       error shouldBe ElementOfWrongType("textarea", "p", Some(IdAttribute("p1")))
     }
 
     "return ElementSiblingNotFound when an element is the last child" in new TestCase {
-      val Left(error) = parent.findDescendantBy[TextArea](IdAttribute("2"))
+      val Left(error) = parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("2"))
         .flatMap(_.nextSibling[TextArea])
 
       error shouldBe ElementSiblingNotFound(Some(IdAttribute("2")))
     }
 
     "return child direct with the given id" in new TestCase {
-      parent.findDescendantBy[TextArea](IdAttribute("1"))
+      parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[P])
         .getOrError.elementId shouldBe Some(IdAttribute("p1"))
     }
