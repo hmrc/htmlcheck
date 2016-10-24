@@ -19,7 +19,7 @@ package uk.gov.voa.htmlcheck
 import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.elements.{ContainerElement, HtmlElement}
+import uk.gov.voa.htmlcheck.elements.{ContainerElement, ElementAttribute, HtmlElement}
 
 import scala.language.{implicitConversions, reflectiveCalls}
 
@@ -41,7 +41,9 @@ object Html {
 
   object Implicits extends Implicits
 
-  trait Implicits extends HtmlElement.Implicits {
+  trait Implicits
+    extends HtmlElement.Implicits
+      with ElementAttribute.Implicits {
 
     implicit class ContentWrapper(content: {def body: String}) {
       val asHtml = Html(content.body)

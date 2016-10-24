@@ -34,6 +34,20 @@ trait ElementAttribute {
 
 object ElementAttribute {
 
+  object Implicits extends Implicits
+
+  trait Implicits {
+
+    implicit class OptionalElementAttributeOps(maybeAttribute: Option[ElementAttribute]) {
+
+      lazy val asString: String = maybeAttribute match {
+        case Some(attribute) => attribute.value
+        case None => ""
+      }
+    }
+
+  }
+
   case class GenericAttribute(name: AttributeName, value: String) extends ElementAttribute {
     require(value.nonEmpty)
 
