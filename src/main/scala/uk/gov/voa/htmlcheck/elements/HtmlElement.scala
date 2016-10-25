@@ -77,7 +77,7 @@ trait ContainerElement {
                                                                                     elementWrapper: Element => HtmlCheckError Xor T,
                                                                                     manifest: Manifest[T]): HtmlCheckError Xor T =
     findDescendantsBy(attribute)(element).filter(_ != null) match {
-      case elements if elements.isEmpty => Left(ElementOfWrongType(getTagTypeFromManifest, element.tagName(), Some(attribute)))
+      case elements if elements.isEmpty => Left(NoElementsFound(getTagTypeFromManifest, Some(attribute)))
       case elements if elements.size == 1 => elementWrapper(elements.head)
       case elements => Left(MoreThanOneElementFound(elements.size, getTagTypeFromManifest, Some(attribute)))
     }

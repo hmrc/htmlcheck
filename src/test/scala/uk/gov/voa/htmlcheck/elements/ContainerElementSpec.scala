@@ -20,7 +20,7 @@ import cats.data.Xor._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html.Implicits._
-import uk.gov.voa.htmlcheck._
+import uk.gov.voa.htmlcheck.{NoElementsFound, _}
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
@@ -87,13 +87,12 @@ class ContainerElementSpec extends UnitSpec {
 
   "findOnlyDescendantBy id" should {
 
-    "return HtmlCheckError when no descendant found with the given id" in new TestCase {
-      val Left(error) = parent.findOnlyDescendantBy[IdAttribute, Li](IdAttribute("invalid-id"))
-      error shouldBe a[HtmlCheckError]
+    "return NoElementsFound when no descendant found with the given id" in new TestCase {
+      parent.findOnlyDescendantBy[IdAttribute, Li]("invalid-id") shouldBe Left(NoElementsFound("li", IdAttribute("invalid-id")))
     }
 
     "return a descendant with the given id" in new TestCase {
-      parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("1")).getOrError.id shouldBe Some(IdAttribute("1"))
+      parent.findOnlyDescendantBy[IdAttribute, TextArea]("1").getOrError.id shouldBe Some(IdAttribute("1"))
     }
   }
 
@@ -108,11 +107,11 @@ class ContainerElementSpec extends UnitSpec {
         |</div>
         |"""
 
-    "return HtmlCheckError when no descendant found with the given class name" in new TestCase {
+    "return NoElementsFound when no descendant found with the given class name" in new TestCase {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div]("div1").getOrError
 
-      div.findOnlyDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(ElementOfWrongType("div", "div", Some(ClassAttribute("invalid-class"))))
+      div.findOnlyDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(NoElementsFound("div", Some(ClassAttribute("invalid-class"))))
     }
 
     "return HtmlCheckError when more than one descendant found with the given class name" in new TestCase {
