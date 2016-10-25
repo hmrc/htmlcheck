@@ -22,20 +22,20 @@ import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html.Implicits._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, ElementSiblingNotFound}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, ElementSiblingNotFound}
 
 class ElementPropertiesSpec extends UnitSpec {
 
   "id" should {
 
     "return element's id if it has one" in new TestCase {
-      parent.id shouldBe Some(IdAttribute("div1"))
+      parent.id shouldBe Right(IdAttribute("div1"))
     }
 
     "return None if there's no id defined for the element" in {
       val element = Legend(Jsoup.parse("<div />").getAllElements.first())
 
-      element.id shouldBe None
+      element.id shouldBe Left(AttributeNotFound(AttributeName("id")))
     }
   }
 
@@ -45,20 +45,20 @@ class ElementPropertiesSpec extends UnitSpec {
       val Left(error) = parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementOfWrongType("textarea", "p", Some(IdAttribute("p1")))
+      error shouldBe ElementOfWrongType("textarea", "p", Right(IdAttribute("p1")))
     }
 
     "return ElementSiblingNotFound when an element is the last child" in new TestCase {
       val Left(error) = parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("2"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementSiblingNotFound(Some(IdAttribute("2")))
+      error shouldBe ElementSiblingNotFound(Right(IdAttribute("2")))
     }
 
     "return child direct with the given id" in new TestCase {
       parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("1"))
         .flatMap(_.nextSibling[P])
-        .getOrError.elementId shouldBe Some(IdAttribute("p1"))
+        .getOrError.id shouldBe Right(IdAttribute("p1"))
     }
   }
 

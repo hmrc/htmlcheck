@@ -18,7 +18,8 @@ package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor.{Left, Right}
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.ElementOfWrongType
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, AttributeNotFound}
+import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
 import uk.gov.voa.htmlcheck.elements.Label.ForAttribute
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
@@ -45,7 +46,7 @@ class LabelSpec extends UnitSpec {
 
       val element = Jsoup.parse(snippet).body().children().first()
 
-      Label.elementWrapper(element) shouldBe Left(ElementOfWrongType("label", "div", None))
+      Label.elementWrapper(element) shouldBe Left(ElementOfWrongType("label", "div", Left(AttributeNotFound(AttributeName("id")))))
     }
   }
 

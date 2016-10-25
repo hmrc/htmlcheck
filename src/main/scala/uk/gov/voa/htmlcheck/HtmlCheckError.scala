@@ -16,7 +16,8 @@
 
 package uk.gov.voa.htmlcheck
 
-import uk.gov.voa.htmlcheck.elements.ElementAttribute
+import cats.data.Xor
+import uk.gov.voa.htmlcheck.elements.{AttributeName, ElementAttribute}
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 
 sealed trait HtmlCheckError extends Throwable {
@@ -25,11 +26,15 @@ sealed trait HtmlCheckError extends Throwable {
   override def getMessage: String = message
 }
 
-case class ElementSiblingNotFound(id: Option[IdAttribute]) extends HtmlCheckError {
-  val message = s"Element with id=$id has no direct next sibling"
+case class AttributeNotFound(attributeName: AttributeName) extends HtmlCheckError {
+  val message = s"No $attributeName attribute found"
 }
 
-case class ElementOfWrongType(expectedType: String, actualType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
+case class ElementSiblingNotFound(maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
+  val message = s"Element${maybeAttribute.map(attribute => s" with ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} has no direct next sibling"
+}
+
+case class ElementOfWrongType(expectedType: String, actualType: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
   val message = s"Found element of $actualType while $expectedType expected${maybeAttribute.map(attribute => s" ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")}"
 }
 

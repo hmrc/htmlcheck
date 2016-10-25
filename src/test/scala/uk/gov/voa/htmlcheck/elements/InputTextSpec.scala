@@ -18,7 +18,7 @@ package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor._
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.ElementOfWrongType
+import uk.gov.voa.htmlcheck.{ElementOfWrongType, AttributeNotFound}
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 
 class InputTextSpec extends UnitSpec {
@@ -44,7 +44,7 @@ class InputTextSpec extends UnitSpec {
 
       val element = Jsoup.parse(snippet).body().children().first()
 
-      InputText.elementWrapper(element) shouldBe Left(ElementOfWrongType("input-text", "div", None))
+      InputText.elementWrapper(element) shouldBe Left(ElementOfWrongType("input-text", "div", Left(AttributeNotFound(AttributeName("id")))))
     }
 
     "return ElementWithIdOfWrongType when instantiated from an 'input' of non text html tag" in {
@@ -55,7 +55,7 @@ class InputTextSpec extends UnitSpec {
 
       val element = Jsoup.parse(snippet).body().children().first()
 
-      InputText.elementWrapper(element) shouldBe Left(ElementOfWrongType("input-text", "input-radio", None))
+      InputText.elementWrapper(element) shouldBe Left(ElementOfWrongType("input-text", "input-radio", Left(AttributeNotFound(AttributeName("id")))))
     }
   }
 

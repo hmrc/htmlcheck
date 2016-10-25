@@ -39,7 +39,7 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return the first child of the requested type" in new TestCase {
-      parent.firstChild[TextArea].getOrError.id shouldBe Some(IdAttribute("1"))
+      parent.firstChild[TextArea].getOrError.id shouldBe Right(IdAttribute("1"))
     }
   }
 
@@ -66,7 +66,7 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div2")).getOrError
 
-      div.onlyChild[Div] shouldBe Left(ElementOfWrongType("div", "p", Some(IdAttribute("p"))))
+      div.onlyChild[Div] shouldBe Left(ElementOfWrongType("div", "p", Right(IdAttribute("p"))))
 
     }
 
@@ -81,7 +81,7 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div2")).getOrError
 
-      div.onlyChild[P].getOrError.id shouldBe Some(IdAttribute("p"))
+      div.onlyChild[P].getOrError.id shouldBe Right(IdAttribute("p"))
     }
   }
 
@@ -92,7 +92,7 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return a descendant with the given id" in new TestCase {
-      parent.findOnlyDescendantBy[IdAttribute, TextArea]("1").getOrError.id shouldBe Some(IdAttribute("1"))
+      parent.findOnlyDescendantBy[IdAttribute, TextArea]("1").getOrError.id shouldBe Right(IdAttribute("1"))
     }
   }
 
@@ -111,14 +111,14 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div]("div1").getOrError
 
-      div.findOnlyDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(NoElementsFound("div", Some(ClassAttribute("invalid-class"))))
+      div.findOnlyDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(NoElementsFound("div", ClassAttribute("invalid-class")))
     }
 
     "return HtmlCheckError when more than one descendant found with the given class name" in new TestCase {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
 
-      div.findOnlyDescendantBy[ClassAttribute, Div](ClassAttribute("div-class")) shouldBe Left(MoreThanOneElementFound(2, "div", Some(ClassAttribute("div-class"))))
+      div.findOnlyDescendantBy[ClassAttribute, Div](ClassAttribute("div-class")) shouldBe Left(MoreThanOneElementFound(2, "div", ClassAttribute("div-class")))
     }
 
     "return descendant with the given class name" in new TestCase {
@@ -138,7 +138,7 @@ class ContainerElementSpec extends UnitSpec {
     "return first child of the given type when it exists" in new TestCase {
       val foundChildren = parent.findFirstChildOfType[TextArea]
 
-      foundChildren.getOrError.id shouldBe Some(IdAttribute("1"))
+      foundChildren.getOrError.id shouldBe Right(IdAttribute("1"))
     }
   }
 
@@ -153,7 +153,7 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return a child of the given type when just one exists" in new TestCase {
-      parent.findOnlyChildOfType[Div].getOrError.id shouldBe Some(IdAttribute("inner-div"))
+      parent.findOnlyChildOfType[Div].getOrError.id shouldBe Right(IdAttribute("inner-div"))
     }
   }
 
@@ -168,15 +168,15 @@ class ContainerElementSpec extends UnitSpec {
 
       foundChildren.getOrError should have size 2
 
-      foundChildren.getOrError.head.id shouldBe Some(IdAttribute("1"))
-      foundChildren.getOrError(1).id shouldBe Some(IdAttribute("2"))
+      foundChildren.getOrError.head.id shouldBe Right(IdAttribute("1"))
+      foundChildren.getOrError(1).id shouldBe Right(IdAttribute("2"))
     }
   }
 
   "findChildOfTypeByIndex" should {
 
     "return child of the given type based on index in sequence" in new TestCase {
-      parent.findChildOfTypeByIndex[TextArea](1).getOrError.id shouldBe Some(IdAttribute("2"))
+      parent.findChildOfTypeByIndex[TextArea](1).getOrError.id shouldBe Right(IdAttribute("2"))
     }
 
     "return ElementOutOfBounds error when no child found on that index" in new TestCase {
@@ -198,8 +198,9 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
-      div.findChildrenBy[IdAttribute, TextArea](IdAttribute("1")).getOrError.map(_.className) shouldBe Seq(
-        Some(ClassAttribute("area-class1")), Some(ClassAttribute("area-class2"))
+      div.findChildrenBy[IdAttribute, TextArea](IdAttribute("1")).getOrError.map(_.className.asString) shouldBe Seq(
+        "area-class1",
+        "area-class2"
       )
     }
 
@@ -232,8 +233,9 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
-      div.findChildrenBy[ClassAttribute, TextArea](ClassAttribute("area-class")).getOrError.map(_.id) shouldBe Seq(
-        Some(IdAttribute("1")), Some(IdAttribute("2"))
+      div.findChildrenBy[ClassAttribute, TextArea](ClassAttribute("area-class")).getOrError.map(_.id.asString) shouldBe Seq(
+        "1",
+        "2"
       )
     }
 
@@ -255,7 +257,7 @@ class ContainerElementSpec extends UnitSpec {
   "findFirstChildBy id" should {
 
     "return first child of the required type having the given id" in new TestCase {
-      parent.findFirstChildBy[IdAttribute, TextArea](IdAttribute("1")).getOrError.id shouldBe Some(IdAttribute("1"))
+      parent.findFirstChildBy[IdAttribute, TextArea](IdAttribute("1")).getOrError.id shouldBe Right(IdAttribute("1"))
     }
 
     "return error if there are no children of the given id" in new TestCase {
@@ -270,7 +272,7 @@ class ContainerElementSpec extends UnitSpec {
   "findFirstChildBy elementClass" should {
 
     "return first child of the required type having the given class" in new TestCase {
-      parent.findFirstChildBy[ClassAttribute, TextArea](ClassAttribute("area-class")).getOrError.id shouldBe Some(IdAttribute("1"))
+      parent.findFirstChildBy[ClassAttribute, TextArea](ClassAttribute("area-class")).getOrError.id shouldBe Right(IdAttribute("1"))
     }
 
     "return error if there are no children of the given class" in new TestCase {
@@ -296,7 +298,7 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
-      div.findOnlyChildBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id shouldBe Some(IdAttribute("p1"))
+      div.findOnlyChildBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id shouldBe Right(IdAttribute("p1"))
     }
 
     "return no children if there are more than one of the given class" in new TestCase {
@@ -335,7 +337,7 @@ class ContainerElementSpec extends UnitSpec {
 
       val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
-      div.findOnlyChildBy[IdAttribute, P](IdAttribute("p1")).getOrError.id shouldBe Some(IdAttribute("p1"))
+      div.findOnlyChildBy[IdAttribute, P](IdAttribute("p1")).getOrError.id shouldBe Right(IdAttribute("p1"))
     }
 
     "return no children if there are more than one of the given id" in new TestCase {

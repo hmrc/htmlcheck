@@ -24,7 +24,7 @@ import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
-case class P(elementId: Option[IdAttribute])(protected val element: Element)
+case class P(protected val element: Element)
   extends HtmlElement
     with ElementProperties
     with ContainerElement
@@ -35,5 +35,5 @@ object P {
     if (element.tagName() != "p")
       Left(ElementOfWrongType("p", element.tagName(), IdAttribute(element)))
     else
-      Right(P(IdAttribute(element))(element))
+      Right(P(element))
 }

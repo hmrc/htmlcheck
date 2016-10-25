@@ -16,15 +16,17 @@
 
 package uk.gov.voa.htmlcheck.elements
 
+import cats.data.Xor._
 import org.scalacheck.Gen
 import org.scalatest.prop.PropertyChecks
+import uk.gov.voa.htmlcheck.AttributeNotFound
 import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
 import uk.gov.voa.htmlcheck.elements.ElementAttribute.Implicits._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
 import uk.gov.voa.htmlcheck.tooling.generators.GeneratorOf
 
-class ElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
+class XorElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
 
 
   private val attributes = for {
@@ -43,15 +45,15 @@ class ElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
   "asString" should {
 
     "return attribute's value if it's not None" in {
-      forAll(attributes.map(Option.apply)) {
-        case maybeAttribute@Some(attribute) =>
+      forAll(attributes.map(right)) {
+        case maybeAttribute@Right(attribute) =>
           maybeAttribute.asString shouldBe attribute.value
-        case None => fail("Wrong test configuration")
+        case _ => fail("Wrong test configuration")
       }
     }
 
     "return an empty String if it's None" in {
-      None.asString shouldBe ""
+      Left(AttributeNotFound(AttributeName("id"))).asString shouldBe ""
     }
 
   }

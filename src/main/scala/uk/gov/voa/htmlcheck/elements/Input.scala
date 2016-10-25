@@ -30,7 +30,7 @@ trait Input
     with ElementProperties
     with ContainerElement {
 
-  lazy val value: Option[ValueAttribute] = ValueAttribute(element)
+  lazy val value: HtmlCheckError Xor ValueAttribute = ValueAttribute(element)
 }
 
 case class Label(protected val element: Element)

@@ -34,17 +34,17 @@ trait ElementProperties {
 
   self: HtmlElement =>
 
-  lazy val id: Option[IdAttribute] = IdAttribute(element)
+  lazy val id: HtmlCheckError Xor IdAttribute = IdAttribute(element)
 
-  lazy val name: Option[NameAttribute] = NameAttribute(element)
+  lazy val name: HtmlCheckError Xor NameAttribute = NameAttribute(element)
 
-  lazy val className: Option[ClassAttribute] = ClassAttribute(element)
+  lazy val className: HtmlCheckError Xor ClassAttribute = ClassAttribute(element)
 
   lazy val classNames: Set[ClassAttribute] = element.classNames().toSet[String].map(ClassAttribute.apply)
 
   lazy val text: String = element.text()
 
-  def attribute(name: AttributeName): Option[GenericAttribute] = GenericAttribute(name, element)
+  def attribute(name: AttributeName): HtmlCheckError Xor GenericAttribute = GenericAttribute(name, element)
 
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =
@@ -52,7 +52,7 @@ trait ElementProperties {
       .flatMap(elementWrapper)
 
   override def toString = IdAttribute(element).map(_.toString)
-    .orElse(Option(element.tagName))
+    .orElse(Right(element.tagName))
     .getOrElse(getClass.getSimpleName)
 }
 
@@ -77,14 +77,14 @@ trait ContainerElement {
                                                                                     elementWrapper: Element => HtmlCheckError Xor T,
                                                                                     manifest: Manifest[T]): HtmlCheckError Xor T =
     findDescendantsBy(attribute)(element).filter(_ != null) match {
-      case elements if elements.isEmpty => Left(NoElementsFound(getTagTypeFromManifest, Some(attribute)))
+      case elements if elements.isEmpty => Left(NoElementsFound(getTagTypeFromManifest, attribute))
       case elements if elements.size == 1 => elementWrapper(elements.head)
-      case elements => Left(MoreThanOneElementFound(elements.size, getTagTypeFromManifest, Some(attribute)))
+      case elements => Left(MoreThanOneElementFound(elements.size, getTagTypeFromManifest, attribute))
     }
 
   def findChildrenOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                            manifest: Manifest[T]): HtmlCheckError Xor Seq[T] = {
-    implicit val contextualAttribute: Option[ElementAttribute] = None
+    implicit val contextualAttribute = None
     val identityPredicate: Element => Boolean = _ => true
 
     findChildrenMatching(identityPredicate).convertThemTo[T]
@@ -111,7 +111,7 @@ trait ContainerElement {
   def findChildrenBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)(implicit filteringPredicate: AT => Element => Boolean,
                                                                               elementWrapper: Element => HtmlCheckError Xor T,
                                                                               manifest: Manifest[T]): HtmlCheckError Xor Seq[T] = {
-    implicit val contextualAttribute: Option[ElementAttribute] = Some(attribute)
+    implicit val contextualAttribute = Some(attribute)
 
     findChildrenMatching(filteringPredicate(attribute)).convertThemTo[T]
   }
