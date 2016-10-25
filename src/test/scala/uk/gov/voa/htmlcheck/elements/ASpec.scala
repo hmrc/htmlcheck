@@ -59,7 +59,7 @@ class ASpec extends UnitSpec {
 
       val element = A(Jsoup.parse(snippet).body().children().first())
 
-      element.href shouldBe Some(HrefAttribute("url"))
+      element.href shouldBe Right(HrefAttribute("url"))
     }
 
     "return None for href when the attribute is not defined on the 'a' tag" in {
@@ -70,7 +70,7 @@ class ASpec extends UnitSpec {
 
       val element = A(Jsoup.parse(snippet).body().children().first())
 
-      element.href shouldBe None
+      element.href shouldBe Left(AttributeNotFound(AttributeName("href")))
     }
 
     "return None for href when the attribute has no value" in {
@@ -81,7 +81,7 @@ class ASpec extends UnitSpec {
 
       val element = A(Jsoup.parse(snippet).body().children().first())
 
-      element.href shouldBe None
+      element.href shouldBe Left(AttributeNotFound(AttributeName("href")))
     }
   }
 }

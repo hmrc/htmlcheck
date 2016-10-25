@@ -21,7 +21,7 @@ import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
 import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -45,10 +45,10 @@ object A {
 
   object HrefAttribute {
 
-    def apply(element: Element): Option[HrefAttribute] =
+    def apply(element: Element): HtmlCheckError Xor HrefAttribute =
       element.attr("href") match {
-        case "" => None
-        case value => Some(HrefAttribute(value))
+        case "" => Left(AttributeNotFound(AttributeName("href")))
+        case value => Right(HrefAttribute(value))
       }
   }
 
