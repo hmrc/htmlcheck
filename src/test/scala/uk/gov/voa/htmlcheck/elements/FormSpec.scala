@@ -60,7 +60,7 @@ class FormSpec extends UnitSpec {
 
       val element = Form(Jsoup.parse(snippet).body().children().first())
 
-      element.action shouldBe Some(ActionAttribute("url"))
+      element.action shouldBe Right(ActionAttribute("url"))
     }
 
     "return None for 'action' when the attribute is not defined on the tag" in {
@@ -71,7 +71,7 @@ class FormSpec extends UnitSpec {
 
       val element = Form(Jsoup.parse(snippet).body().children().first())
 
-      element.action shouldBe None
+      element.action shouldBe Left(AttributeNotFound(AttributeName("action")))
     }
 
     "return None for 'for' when the attribute has no value" in {
@@ -82,7 +82,7 @@ class FormSpec extends UnitSpec {
 
       val element = Form(Jsoup.parse(snippet).body().children().first())
 
-      element.action shouldBe None
+      element.action shouldBe Left(AttributeNotFound(AttributeName("action")))
     }
   }
 

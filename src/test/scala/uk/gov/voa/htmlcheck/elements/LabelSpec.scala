@@ -18,10 +18,9 @@ package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor.{Left, Right}
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, AttributeNotFound}
-import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
 import uk.gov.voa.htmlcheck.elements.Label.ForAttribute
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType}
 
 class LabelSpec extends UnitSpec {
 
@@ -60,7 +59,7 @@ class LabelSpec extends UnitSpec {
 
       val element = Label(Jsoup.parse(snippet).body().children().first())
 
-      element.forAttribute shouldBe Some(ForAttribute("abc"))
+      element.forAttribute shouldBe Right(ForAttribute("abc"))
     }
 
     "return None for 'for' when the attribute is not defined on the tag" in {
@@ -71,7 +70,7 @@ class LabelSpec extends UnitSpec {
 
       val element = Label(Jsoup.parse(snippet).body().children().first())
 
-      element.forAttribute shouldBe None
+      element.forAttribute shouldBe Left(AttributeNotFound(AttributeName("for")))
     }
 
     "return None for 'for' when the attribute has no value" in {
@@ -82,7 +81,7 @@ class LabelSpec extends UnitSpec {
 
       val element = Label(Jsoup.parse(snippet).body().children().first())
 
-      element.forAttribute shouldBe None
+      element.forAttribute shouldBe Left(AttributeNotFound(AttributeName("for")))
     }
   }
 

@@ -21,7 +21,7 @@ import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute.{IdAttribute, ValueAttribute}
 import uk.gov.voa.htmlcheck.elements.Label.ForAttribute
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -53,10 +53,10 @@ object Label {
 
   object ForAttribute {
 
-    def apply(element: Element): Option[ForAttribute] =
+    def apply(element: Element): HtmlCheckError Xor ForAttribute =
       element.attr("for") match {
-        case "" => None
-        case value => Some(ForAttribute(value))
+        case "" => Left(AttributeNotFound(AttributeName("for")))
+        case value => Right(ForAttribute(value))
       }
   }
 

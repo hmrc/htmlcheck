@@ -21,7 +21,7 @@ import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
 import uk.gov.voa.htmlcheck.elements.Form.{ActionAttribute, MethodAttribute}
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, HtmlCheckError}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -30,7 +30,7 @@ case class Form(protected val element: Element)
     with ElementProperties
     with ContainerElement {
 
-  lazy val action: Option[ActionAttribute] = ActionAttribute(element)
+  lazy val action: HtmlCheckError Xor ActionAttribute = ActionAttribute(element)
   lazy val method: MethodAttribute = MethodAttribute(element)
 }
 
@@ -46,10 +46,10 @@ object Form {
 
   object ActionAttribute {
 
-    def apply(element: Element): Option[ActionAttribute] =
+    def apply(element: Element): HtmlCheckError Xor ActionAttribute =
       element.attr("action") match {
-        case "" => None
-        case value => Some(ActionAttribute(value))
+        case "" => Left(AttributeNotFound(AttributeName("action")))
+        case value => Right(ActionAttribute(value))
       }
   }
 
