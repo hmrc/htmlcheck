@@ -129,6 +129,52 @@ class ContainerElementSpec extends UnitSpec {
     }
   }
 
+  "findFirstDescendantBy id" should {
+
+    "return NoElementsFound when no descendant found with the given id" in new TestCase {
+      parent.findFirstDescendantBy[IdAttribute, Li]("invalid-id") shouldBe Left(NoElementsFound("li", IdAttribute("invalid-id")))
+    }
+
+    "return the first descendant with the given id" in new TestCase {
+      parent.findFirstDescendantBy[IdAttribute, TextArea]("1").getOrError.id shouldBe Right(IdAttribute("1"))
+    }
+  }
+
+  "findFirstDescendantBy className" should {
+
+    val snippet =
+      """<div id="div1">
+        | <div id="div2" class="div-class">
+        |   <p id="p1" class="p-class"></p>
+        | </div>
+        | <div id="div3" class="div-class">
+        |   <p id="p2" class="p-class"></p>
+        | </div>
+        |</div>
+        |"""
+
+    "return NoElementsFound when no descendant found with the given class name" in new TestCase {
+
+      val div = html(snippet).findFirstDescendantBy[IdAttribute, Div]("div1").getOrError
+
+      div.findFirstDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(NoElementsFound("div", ClassAttribute("invalid-class")))
+    }
+
+    "return the first descendant when there are more than one descendant with the given class name" in new TestCase {
+
+      val div = html(snippet).findFirstDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
+
+      div.findFirstDescendantBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id.asString shouldBe "p1"
+    }
+
+    "return descendant with the given class name if there's just one" in new TestCase {
+
+      val div = html(snippet).findFirstDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
+
+      div.findFirstDescendantBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id.asString shouldBe "p1"
+    }
+  }
+
   "findFirstChildOfType" should {
 
     "return ElementOfTypeNotFound when no children of the given type found" in new TestCase {

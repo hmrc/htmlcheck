@@ -82,6 +82,14 @@ trait ContainerElement {
       case elements => Left(MoreThanOneElementFound(elements.size, getTagTypeFromManifest, attribute))
     }
 
+  def findFirstDescendantBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)(implicit findDescendantsBy: AT => Element => Seq[Element],
+                                                                                     elementWrapper: Element => HtmlCheckError Xor T,
+                                                                                     manifest: Manifest[T]): HtmlCheckError Xor T =
+    findDescendantsBy(attribute)(element).filter(_ != null) match {
+      case elements if elements.isEmpty => Left(NoElementsFound(getTagTypeFromManifest, attribute))
+      case elements => elementWrapper(elements.head)
+    }
+
   def findChildrenOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                            manifest: Manifest[T]): HtmlCheckError Xor Seq[T] = {
     implicit val contextualAttribute = None
@@ -181,7 +189,7 @@ object HtmlElement {
     implicit val descendantByIdFinder: IdAttribute => Element => Seq[Element] =
       id => element => Seq(element.getElementById(id.value))
 
-    implicit val descendantByClassFinder: ClassAttribute  => Element => Seq[Element] =
+    implicit val descendantByClassFinder: ClassAttribute => Element => Seq[Element] =
       className => element => element.getElementsByClass(className.value).iterator().toSeq
   }
 
