@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html.Implicits._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, ElementSiblingNotFound}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, ElementSiblingNotFound, NoElementsFound}
 
 class ElementPropertiesSpec extends UnitSpec {
 
@@ -52,7 +52,7 @@ class ElementPropertiesSpec extends UnitSpec {
       val Left(error) = parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("2"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementSiblingNotFound(Right(IdAttribute("2")))
+      error shouldBe ElementSiblingNotFound("has no direct next sibling", Right(IdAttribute("2")))
     }
 
     "return child direct with the given id" in new TestCase {
@@ -62,20 +62,51 @@ class ElementPropertiesSpec extends UnitSpec {
     }
   }
 
-  private trait TestCase {
-    self =>
+  "findNextClosestSiblingOfType" should {
 
-    val element = Jsoup.parse(
+    val snippet =
       """
-        |<div id="div1">
+        |<div id="div">
         | <textarea id="1"></textArea>
         | <p id="p1"></p>
         | <textarea id="2"></textArea>
+        | <textarea id="3"></textArea>
         |</div>
-      """.stripMargin).getElementById("div1")
+      """.toHtml
+
+    "return ElementSiblingNotFound when an element is the last child" in new TestCase {
+
+      val textArea = snippet.findFirstDescendantBy[IdAttribute, TextArea]("3").getOrError
+
+      textArea.findNextClosestSiblingOfType[Li] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'li'", Right(IdAttribute("3"))))
+    }
+
+    "return ElementSiblingNotFound when there is no following sibling of the required type" in new TestCase {
+
+      val p = snippet.findFirstDescendantBy[IdAttribute, P]("p1").getOrError
+
+      p.findNextClosestSiblingOfType[Li] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'li'", Right(IdAttribute("p1"))))
+    }
+
+    "return the first following sibling of the given type" in {
+
+      val textArea = snippet.findFirstDescendantBy[IdAttribute, TextArea]("1").getOrError
+
+      textArea.findNextClosestSiblingOfType[TextArea].getOrError.id shouldBe Right(IdAttribute("2"))
+    }
+  }
+
+  private trait TestCase {
 
     val parent = new HtmlElement with ElementProperties with ContainerElement {
-      val element: Element = self.element
+      val element: Element =
+        """
+          |<div id="div1">
+          | <textarea id="1"></textArea>
+          | <p id="p1"></p>
+          | <textarea id="2"></textArea>
+          |</div>
+        """.parse.getElementById("div1")
     }
   }
 

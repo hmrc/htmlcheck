@@ -16,6 +16,18 @@
 
 package uk.gov.voa.htmlcheck.tooling
 
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.scalatest.{Matchers, WordSpec}
+import uk.gov.voa.htmlcheck.Html
 
-trait UnitSpec extends WordSpec with Matchers
+trait UnitSpec extends WordSpec with Matchers {
+
+  protected implicit class StringToHtmlConverter(html: String) {
+
+    lazy val toHtml: Html = Html(html.stripMargin)
+
+    lazy val parse: Element = Jsoup.parse(html.stripMargin)
+
+  }
+}

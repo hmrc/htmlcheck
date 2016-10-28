@@ -17,12 +17,11 @@
 package uk.gov.voa.htmlcheck.elements
 
 import cats.data.Xor._
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html.Implicits._
-import uk.gov.voa.htmlcheck.{NoElementsFound, _}
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
+import uk.gov.voa.htmlcheck.{NoElementsFound, _}
 
 class ContainerElementSpec extends UnitSpec {
 
@@ -44,6 +43,7 @@ class ContainerElementSpec extends UnitSpec {
   }
 
   "onlyChild" should {
+
     val snippet =
       """<div id="div1" />
         |<div id="div2">
@@ -53,33 +53,32 @@ class ContainerElementSpec extends UnitSpec {
         | <p id="p1"></p>
         | <p id="p1"></p>
         |</div>
-        |"""
+        |""".toHtml
 
     "return ElementOfTypeNotFound when there are no children" in new TestCase {
 
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
+      val div = snippet.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
 
       div.onlyChild[Div] shouldBe Left(ElementOfTypeNotFound("div", Some("as the only child")))
     }
 
     "return ElementOfWrongType when the only child is of different type" in new TestCase {
 
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div2")).getOrError
+      val div = snippet.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div2")).getOrError
 
       div.onlyChild[Div] shouldBe Left(ElementOfWrongType("div", "p", Right(IdAttribute("p"))))
-
     }
 
     "return HtmlCheckError when there is more than one child even of different type" in new TestCase {
 
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div3")).getOrError
+      val div = snippet.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div3")).getOrError
 
       div.onlyChild[P] shouldBe Left(MoreThanOneElementFound(2, "p"))
     }
 
     "return the child of the requested type" in new TestCase {
 
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div2")).getOrError
+      val div = snippet.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div2")).getOrError
 
       div.onlyChild[P].getOrError.id shouldBe Right(IdAttribute("p"))
     }
@@ -98,33 +97,24 @@ class ContainerElementSpec extends UnitSpec {
 
   "findOnlyDescendantBy className" should {
 
-    val snippet =
+    val div =
       """<div id="div1">
         | <div id="div2" class="div-class">
         |   <p id="p1" class="p-class"></p>
         | </div>
         | <div id="div3" class="div-class" />
         |</div>
-        |"""
+        |""".toHtml.findOnlyDescendantBy[IdAttribute, Div]("div1").getOrError
 
     "return NoElementsFound when no descendant found with the given class name" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div]("div1").getOrError
-
       div.findOnlyDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(NoElementsFound("div", ClassAttribute("invalid-class")))
     }
 
     "return HtmlCheckError when more than one descendant found with the given class name" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
-
       div.findOnlyDescendantBy[ClassAttribute, Div](ClassAttribute("div-class")) shouldBe Left(MoreThanOneElementFound(2, "div", ClassAttribute("div-class")))
     }
 
     "return descendant with the given class name" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
-
       div.findOnlyDescendantBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id.asString shouldBe "p1"
     }
   }
@@ -142,7 +132,7 @@ class ContainerElementSpec extends UnitSpec {
 
   "findFirstDescendantBy className" should {
 
-    val snippet =
+    val div =
       """<div id="div1">
         | <div id="div2" class="div-class">
         |   <p id="p1" class="p-class"></p>
@@ -151,26 +141,17 @@ class ContainerElementSpec extends UnitSpec {
         |   <p id="p2" class="p-class"></p>
         | </div>
         |</div>
-        |"""
+        |""".toHtml.findFirstDescendantBy[IdAttribute, Div]("div1").getOrError
 
     "return NoElementsFound when no descendant found with the given class name" in new TestCase {
-
-      val div = html(snippet).findFirstDescendantBy[IdAttribute, Div]("div1").getOrError
-
       div.findFirstDescendantBy[ClassAttribute, Div]("invalid-class") shouldBe Left(NoElementsFound("div", ClassAttribute("invalid-class")))
     }
 
     "return the first descendant when there are more than one descendant with the given class name" in new TestCase {
-
-      val div = html(snippet).findFirstDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
-
       div.findFirstDescendantBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id.asString shouldBe "p1"
     }
 
     "return descendant with the given class name if there's just one" in new TestCase {
-
-      val div = html(snippet).findFirstDescendantBy[IdAttribute, Div](IdAttribute("div1")).getOrError
-
       div.findFirstDescendantBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id.asString shouldBe "p1"
     }
   }
@@ -232,18 +213,15 @@ class ContainerElementSpec extends UnitSpec {
 
   "findChildrenBy id" should {
 
-    val snippet =
+    val div =
       """<div id="div">
         | <textarea id="1" class="area-class1"></textArea>
         | <p id="p1"></p>
         | <textarea id="1" class="area-class2"></textArea>
         |</div>
-        |"""
+        |""".toHtml.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
     "return all children of the required type with the given id" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findChildrenBy[IdAttribute, TextArea](IdAttribute("1")).getOrError.map(_.className.asString) shouldBe Seq(
         "area-class1",
         "area-class2"
@@ -251,34 +229,25 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return no children if there are no children with the given id" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findChildrenBy[IdAttribute, TextArea](IdAttribute("unknown")) shouldBe Left(NoElementsFound("textarea", IdAttribute("unknown")))
     }
 
     "return no children if there are children with the given id but of different type" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findChildrenBy[IdAttribute, TextArea](IdAttribute("p1")) shouldBe Left(NoElementsFound("textarea", IdAttribute("p1")))
     }
   }
 
   "findChildrenBy className" should {
 
-    val snippet =
+    val div =
       """<div id="div">
         | <textarea id="1" class="area-class"></textArea>
         | <p></p>
         | <textarea id="2" class="area-class"></textArea>
         |</div>
-        |"""
+        |""".toHtml.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
     "return all children of the required type with the given class" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findChildrenBy[ClassAttribute, TextArea](ClassAttribute("area-class")).getOrError.map(_.id.asString) shouldBe Seq(
         "1",
         "2"
@@ -286,16 +255,10 @@ class ContainerElementSpec extends UnitSpec {
     }
 
     "return no children if there are no children with the given class" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findChildrenBy[ClassAttribute, TextArea](ClassAttribute("unknown-class")) shouldBe Left(NoElementsFound("textarea", ClassAttribute("unknown-class")))
     }
 
     "return no children if there are children with the given class but of different type" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findChildrenBy[ClassAttribute, P](ClassAttribute("area-class")) shouldBe Left(NoElementsFound("p", ClassAttribute("area-class")))
     }
   }
@@ -332,78 +295,54 @@ class ContainerElementSpec extends UnitSpec {
 
   "findOnlyChildBy elementClass" should {
 
-    val snippet =
+    val div =
       """<div id="div">
         | <textarea id="1" class="area-class"></textArea>
         | <p id="p1" class="p-class"></p>
         | <textarea id="2" class="area-class"></textArea>
         |</div>
-        |"""
+        |""".toHtml.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
     "return found child of the required type having the given class" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[ClassAttribute, P](ClassAttribute("p-class")).getOrError.id shouldBe Right(IdAttribute("p1"))
     }
 
     "return no children if there are more than one of the given class" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[ClassAttribute, TextArea](ClassAttribute("area-class")) shouldBe Left(MoreThanOneElementFound(2, "textarea", ClassAttribute("area-class")))
     }
 
     "return no children if there are no children of the given class" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[ClassAttribute, TextArea](ClassAttribute("unknown-class")) shouldBe Left(NoElementsFound("textarea", ClassAttribute("unknown-class")))
     }
 
     "return no children if there are children of the given class but of different type" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[ClassAttribute, P](ClassAttribute("area-class")) shouldBe Left(NoElementsFound("p", ClassAttribute("area-class")))
     }
   }
 
   "findOnlyChildBy id" should {
 
-    val snippet =
+    val div =
       """<div id="div">
         | <textarea id="1"></textArea>
         | <p id="p1"></p>
         | <textarea id="1"></textArea>
         |</div>
-        |"""
+        |""".toHtml.findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
 
     "return found child of the required type having the given id" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[IdAttribute, P](IdAttribute("p1")).getOrError.id shouldBe Right(IdAttribute("p1"))
     }
 
     "return no children if there are more than one of the given id" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[IdAttribute, TextArea](IdAttribute("1")) shouldBe Left(MoreThanOneElementFound(2, "textarea", IdAttribute("1")))
     }
 
     "return no children if there are no children of the given id" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[IdAttribute, TextArea](IdAttribute("unknown")) shouldBe Left(NoElementsFound("textarea", IdAttribute("unknown")))
     }
 
     "return no children if there are children of the given id but of different type" in new TestCase {
-
-      val div = html(snippet).findOnlyDescendantBy[IdAttribute, Div](IdAttribute("div")).getOrError
-
       div.findOnlyChildBy[IdAttribute, P](IdAttribute("1")) shouldBe Left(NoElementsFound("p", IdAttribute("1")))
     }
   }
@@ -411,22 +350,16 @@ class ContainerElementSpec extends UnitSpec {
   private trait TestCase {
     self =>
 
-    val element = Jsoup.parse(
-      """
-        |<div id="div">
-        | <textarea id="1" class="area-class"></textArea>
-        | <p></p>
-        | <textarea id="2" class="area-class"></textArea>
-        | <div id="inner-div"></div>
-        |</div>
-      """.stripMargin).getElementById("div")
-
     val parent = new ContainerElement with HtmlElement with ElementProperties {
-      val element: Element = self.element
-    }
-
-    def html(body: String) = new ContainerElement with HtmlElement with ElementProperties {
-      val element: Element = Jsoup.parse(body.stripMargin)
+      val element: Element =
+        """
+          |<div id="div">
+          | <textarea id="1" class="area-class"></textArea>
+          | <p></p>
+          | <textarea id="2" class="area-class"></textArea>
+          | <div id="inner-div"></div>
+          |</div>
+        """.parse.getElementById("div")
     }
   }
 

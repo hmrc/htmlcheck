@@ -30,8 +30,8 @@ case class AttributeNotFound(attributeName: AttributeName) extends HtmlCheckErro
   val message = s"No $attributeName attribute found"
 }
 
-case class ElementSiblingNotFound(maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
-  val message = s"Element${maybeAttribute.map(attribute => s" with ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} has no direct next sibling"
+case class ElementSiblingNotFound(explanation: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
+  val message = s"Element${maybeAttribute.map(attribute => s" with ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} $explanation"
 }
 
 case class ElementOfWrongType(expectedType: String, actualType: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {

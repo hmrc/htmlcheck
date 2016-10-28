@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 
+import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 
@@ -30,7 +31,7 @@ trait HtmlElement {
   protected def element: Element
 }
 
-trait ElementProperties {
+trait ElementProperties extends TagNameFinder {
 
   self: HtmlElement =>
 
@@ -48,15 +49,29 @@ trait ElementProperties {
 
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =
-    Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound(id))
+    Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound("has no direct next sibling", id))
       .flatMap(elementWrapper)
+
+  def findNextClosestSiblingOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                     manifest: Manifest[T]): HtmlCheckError Xor T = {
+    @tailrec
+    def checkIfOfProperType(maybeCandidate: Option[Element]): HtmlCheckError Xor T = maybeCandidate match {
+      case None => Left(ElementSiblingNotFound(s"has no next sibling of type '$getTagTypeFromManifest'", id))
+      case Some(candidate) => elementWrapper(candidate) match {
+        case Right(found) => Right(found)
+        case Left(error) => checkIfOfProperType(Option(candidate.nextElementSibling()))
+      }
+    }
+
+    checkIfOfProperType(Option(element.nextElementSibling))
+  }
 
   override def toString = IdAttribute(element).map(_.toString)
     .orElse(Right(element.tagName))
     .getOrElse(getClass.getSimpleName)
 }
 
-trait ContainerElement {
+trait ContainerElement extends TagNameFinder {
 
   self: HtmlElement =>
 
@@ -169,7 +184,11 @@ trait ContainerElement {
 
   }
 
-  private def getTagTypeFromManifest(implicit manifest: Manifest[_]) =
+}
+
+protected trait TagNameFinder {
+
+  protected def getTagTypeFromManifest(implicit manifest: Manifest[_]) =
     manifest.runtimeClass.getSimpleName.toLowerCase
 
 }
