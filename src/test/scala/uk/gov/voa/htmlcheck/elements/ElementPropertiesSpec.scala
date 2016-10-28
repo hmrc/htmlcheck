@@ -69,6 +69,9 @@ class ElementPropertiesSpec extends UnitSpec {
         |<div id="div">
         | <textarea id="1"></textArea>
         | <p id="p1"></p>
+        | <div id="inner-div">
+        |   <p />
+        | </div>
         | <textarea id="2"></textArea>
         | <textarea id="3"></textArea>
         |</div>
@@ -85,7 +88,7 @@ class ElementPropertiesSpec extends UnitSpec {
 
       val p = snippet.findFirstDescendantBy[IdAttribute, P]("p1").getOrError
 
-      p.findNextClosestSiblingOfType[Li] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'li'", Right(IdAttribute("p1"))))
+      p.findNextClosestSiblingOfType[P] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'p'", Right(IdAttribute("p1"))))
     }
 
     "return the first following sibling of the given type" in {
