@@ -51,3 +51,31 @@ object H2 {
     else
       Right(H2(element))
 }
+
+case class H3(protected val element: Element)
+  extends HtmlElement
+    with ElementProperties
+    with ContainerElement
+
+object H3 {
+
+  implicit def elementWrapper(element: Element): HtmlCheckError Xor H3 =
+    if (element.tagName() != "h3")
+      Left(ElementOfWrongType("h3", element.tagName(), IdAttribute(element)))
+    else
+      Right(H3(element))
+}
+
+case class H4(protected val element: Element)
+  extends HtmlElement
+    with ElementProperties
+    with ContainerElement
+
+object H4 {
+
+  implicit def elementWrapper(element: Element): HtmlCheckError Xor H4 =
+    if (element.tagName() != "h4")
+      Left(ElementOfWrongType("h4", element.tagName(), IdAttribute(element)))
+    else
+      Right(H4(element))
+}

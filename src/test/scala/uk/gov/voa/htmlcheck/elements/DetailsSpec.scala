@@ -16,63 +16,24 @@
 
 package uk.gov.voa.htmlcheck.elements
 
-import cats.data.Xor.{Left, Right}
-import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType}
+import cats.data.Xor
+import org.jsoup.nodes.Element
+import uk.gov.voa.htmlcheck.HtmlCheckError
 
-class DetailsSpec extends UnitSpec {
+class DetailsSpec extends HtmlElementSpec[Details] {
 
-  "elementWrapper" should {
+  lazy val tagName = "details"
 
-    "successfully instantiate from a 'details' html tag" in {
-      val snippet =
-        """
-          |<details />
-          |""".stripMargin
+  lazy val elementWrapper: (Element) => HtmlCheckError Xor Details = Details.elementWrapper
 
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Details.elementWrapper(element) shouldBe Right(Details(element))
-    }
-
-    "return ElementWithIdOfWrongType when instantiated from a non 'details' html tag" in {
-      val snippet =
-        """
-          |<div />
-          |""".stripMargin
-
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Details.elementWrapper(element) shouldBe Left(ElementOfWrongType("details", "div", Left(AttributeNotFound(AttributeName("id")))))
-    }
-  }
+  lazy val elementApply: (Element) => Details = Details.apply
 }
 
-class SummarySpec extends UnitSpec {
+class SummarySpec extends HtmlElementSpec[Summary] {
 
-  "elementWrapper" should {
+  lazy val tagName = "summary"
 
-    "successfully instantiate from a 'summary' html tag" in {
-      val snippet =
-        """
-          |<summary />
-          |""".stripMargin
+  lazy val elementWrapper: (Element) => HtmlCheckError Xor Summary = Summary.elementWrapper
 
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Summary.elementWrapper(element) shouldBe Right(Summary(element))
-    }
-
-    "return ElementWithIdOfWrongType when instantiated from a non 'summary' html tag" in {
-      val snippet =
-        """
-          |<div />
-          |""".stripMargin
-
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Summary.elementWrapper(element) shouldBe Left(ElementOfWrongType("summary", "div", Left(AttributeNotFound(AttributeName("id")))))
-    }
-  }
+  lazy val elementApply: (Element) => Summary = Summary.apply
 }

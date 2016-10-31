@@ -16,38 +16,20 @@
 
 package uk.gov.voa.htmlcheck.elements
 
+import cats.data.Xor
 import cats.data.Xor.{Left, Right}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.Label.ForAttribute
-import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, HtmlCheckError}
 
-class LabelSpec extends UnitSpec {
+class LabelSpec extends HtmlElementSpec[Label] {
 
-  "elementWrapper" should {
+  lazy val tagName = "label"
 
-    "successfully instantiate from a 'label' html tag" in {
-      val snippet =
-        """
-          |<label />
-          |""".stripMargin
+  lazy val elementWrapper: (Element) => HtmlCheckError Xor Label = Label.elementWrapper
 
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Label.elementWrapper(element) shouldBe Right(Label(element))
-    }
-
-    "return ElementWithIdOfWrongType when instantiated from a non 'label' html tag" in {
-      val snippet =
-        """
-          |<div />
-          |""".stripMargin
-
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Label.elementWrapper(element) shouldBe Left(ElementOfWrongType("label", "div", Left(AttributeNotFound(AttributeName("id")))))
-    }
-  }
+  lazy val elementApply: (Element) => Label = Label.apply
 
   "forAttribute" should {
 

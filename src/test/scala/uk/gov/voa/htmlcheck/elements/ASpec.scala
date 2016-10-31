@@ -16,38 +16,21 @@
 
 package uk.gov.voa.htmlcheck.elements
 
+import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, AttributeNotFound}
+import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.A.HrefAttribute
-import uk.gov.voa.htmlcheck.tooling.UnitSpec
+import uk.gov.voa.htmlcheck.{AttributeNotFound, HtmlCheckError}
 
-class ASpec extends UnitSpec {
+class ASpec extends HtmlElementSpec[A] {
 
-  "elementWrapper" should {
+  lazy val tagName = "a"
 
-    "successfully instantiate from a 'a' html tag" in {
-      val snippet =
-        """
-          |<a href="url">text</a>
-          |""".stripMargin
+  lazy val elementWrapper: (Element) => HtmlCheckError Xor A = A.elementWrapper
 
-      val element = Jsoup.parse(snippet).body().children().first()
+  lazy val elementApply: (Element) => A = A.apply
 
-      A.elementWrapper(element) shouldBe Right(A(element))
-    }
-
-    "return ElementWithIdOfWrongType when instantiated from a non 'a' html tag" in {
-      val snippet =
-        """
-          |<div />
-          |""".stripMargin
-
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      A.elementWrapper(element) shouldBe Left(ElementOfWrongType("a", "div", Left(AttributeNotFound(AttributeName("id")))))
-    }
-  }
 
   "href" should {
 

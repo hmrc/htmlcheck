@@ -16,39 +16,21 @@
 
 package uk.gov.voa.htmlcheck.elements
 
+import cats.data.Xor
 import cats.data.Xor.{Left, Right}
 import org.jsoup.Jsoup
-import uk.gov.voa.htmlcheck.{ElementOfWrongType, AttributeNotFound}
+import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.elements.Form.MethodAttribute.{Get, Post}
 import uk.gov.voa.htmlcheck.elements.Form._
-import uk.gov.voa.htmlcheck.tooling.UnitSpec
+import uk.gov.voa.htmlcheck.{AttributeNotFound, HtmlCheckError}
 
-class FormSpec extends UnitSpec {
+class FormSpec extends HtmlElementSpec[Form] {
 
-  "elementWrapper" should {
+  lazy val tagName = "form"
 
-    "successfully instantiate from a 'form' html tag" in {
-      val snippet =
-        """
-          |<form />
-          |""".stripMargin
+  lazy val elementWrapper: (Element) => HtmlCheckError Xor Form = Form.elementWrapper
 
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Form.elementWrapper(element) shouldBe Right(Form(element))
-    }
-
-    "return ElementWithIdOfWrongType when instantiated from a non 'form' html tag" in {
-      val snippet =
-        """
-          |<div />
-          |""".stripMargin
-
-      val element = Jsoup.parse(snippet).body().children().first()
-
-      Form.elementWrapper(element) shouldBe Left(ElementOfWrongType("form", "div", Left(AttributeNotFound(AttributeName("id")))))
-    }
-  }
+  lazy val elementApply: (Element) => Form = Form.apply
 
   "action" should {
 
