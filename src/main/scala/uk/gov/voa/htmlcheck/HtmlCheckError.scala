@@ -56,7 +56,7 @@ object NoElementsFound {
 }
 
 case class MoreThanOneElementFound(numberOfFoundElements: Int, tagType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
-  val message = s"There are $numberOfFoundElements elements of type=$tagType${maybeAttribute.map(attribute => s" having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} found while one was expected"
+  val message = s"There are $numberOfFoundElements elements found but only one '$tagType'${maybeAttribute.map(attribute => s" having ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} was expected"
 }
 
 object MoreThanOneElementFound {
