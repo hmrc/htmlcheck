@@ -27,7 +27,7 @@ sealed trait HtmlCheckError extends Throwable {
 }
 
 case class AttributeNotFound(attributeName: AttributeName) extends HtmlCheckError {
-  val message = s"No $attributeName attribute found"
+  val message = s"No '$attributeName' attribute found"
 }
 
 case class ElementSiblingNotFound(explanation: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
@@ -35,11 +35,11 @@ case class ElementSiblingNotFound(explanation: String, maybeAttribute: HtmlCheck
 }
 
 case class ElementOfWrongType(expectedType: String, actualType: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
-  val message = s"Found element of $actualType while $expectedType expected${maybeAttribute.map(attribute => s" ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")}"
+  val message = s"Found '$actualType' element while '$expectedType' expected${maybeAttribute.map(attribute => s" ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")}"
 }
 
 case class ElementOfTypeNotFound(tagType: String, maybeMessage: Option[String] = None) extends HtmlCheckError {
-  val message = s"Element of type=$tagType not found${maybeMessage.map(message => s" $message").getOrElse("")}"
+  val message = s"'$tagType' element not found${maybeMessage.map(message => s" $message").getOrElse("")}"
 }
 
 case class NoElementsFound(tagType: String, maybeAttribute: Option[ElementAttribute]) extends HtmlCheckError {
