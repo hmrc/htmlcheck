@@ -88,6 +88,22 @@ trait ContainerElement extends TagNameFinder {
       case elements => elementWrapper(elements.head)
     }
 
+  def findFirstDescendantOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
+                                                  manifest: Manifest[T]): HtmlCheckError Xor T = {
+
+    @tailrec
+    def findElementOfType(elements: Seq[Element]): HtmlCheckError Xor T =
+      elements match {
+        case Nil => Left(ElementOfTypeNotFound(getTagTypeFromManifest, Some(s"among $tagName descendants")))
+        case firstElement +: allTheRest => elementWrapper(firstElement) match {
+          case error@Left(_) => findElementOfType(allTheRest)
+          case foundElement => foundElement
+        }
+      }
+
+    findElementOfType(element.getAllElements.listIterator().toSeq)
+  }
+
   def findOnlyDescendantBy[AT <: ElementAttribute, T <: HtmlElement](attribute: AT)(implicit findDescendantsBy: AT => Element => Seq[Element],
                                                                                     elementWrapper: Element => HtmlCheckError Xor T,
                                                                                     manifest: Manifest[T]): HtmlCheckError Xor T =

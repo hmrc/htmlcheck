@@ -95,6 +95,36 @@ class ContainerElementSpec extends UnitSpec {
     }
   }
 
+  "findFirstDescendantOfType" should {
+
+    val div =
+      """<div id="div1">
+        | <div id="div2">
+        |   <p id="p1"></p>
+        | </div>
+        | <div id="div3">
+        |   <p id="p2"></p>
+        |   <div>
+        |     <a href="url"></a>
+        |   </div>
+        | </div>
+        |</div>
+        |""".toHtml.findOnlyDescendantBy[IdAttribute, Div]("div1").getOrError
+
+    "return NoElementsFound when no descendant of the requested type is found" in new TestCase {
+      div.findFirstDescendantOfType[Ul] shouldBe Left(ElementOfTypeNotFound("ul", Some(s"among div descendants")))
+    }
+
+    "return the first descendant of the requested type if there are more than one" in new TestCase {
+      div.findFirstDescendantOfType[P].getOrError.id.asString shouldBe "p1"
+    }
+
+    "return the first descendant of the requested type if it's nested few levels" in new TestCase {
+      div.findFirstDescendantOfType[A].getOrError.href.asString shouldBe "url"
+    }
+
+  }
+
   "findOnlyDescendantBy className" should {
 
     val div =
