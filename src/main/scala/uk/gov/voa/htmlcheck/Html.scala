@@ -27,14 +27,14 @@ case class Html(body: String)
   extends HtmlElement
     with ContainerElement {
 
-  lazy val element = Jsoup.parse(body)
+  protected lazy val element = Jsoup.parse(body)
 
-  lazy val heading: HtmlCheckError Xor String = element.getElementsByTag("h1") match {
-    case elements if elements.isEmpty => Left(ElementOfTypeNotFound("h1"))
-    case elements => Right(elements.first().text().trim)
+  lazy val title = element.title match {
+    case "" => Left(ElementOfTypeNotFound("title"))
+    case txt => Right(txt)
   }
 
-  lazy val title = element.title
+  lazy val text: String = element.text()
 }
 
 object Html {
