@@ -49,14 +49,14 @@ trait ElementProperties extends TagNameFinder {
 
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =
-    Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound("has no direct next sibling", id))
+    Xor.fromOption(Option(element.nextElementSibling), ElementSiblingNotFound("has no direct next sibling", tagName, id))
       .flatMap(elementWrapper)
 
   def findNextClosestSiblingOfType[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                                      manifest: Manifest[T]): HtmlCheckError Xor T = {
     @tailrec
     def checkIfOfProperType(maybeCandidate: Option[Element]): HtmlCheckError Xor T = maybeCandidate match {
-      case None => Left(ElementSiblingNotFound(s"has no next sibling of type '$getTagTypeFromManifest'", id))
+      case None => Left(ElementSiblingNotFound(s"has no next sibling of type '$getTagTypeFromManifest'", tagName, id))
       case Some(candidate) => elementWrapper(candidate) match {
         case Right(found) => Right(found)
         case Left(error) => checkIfOfProperType(Option(candidate.nextElementSibling()))
@@ -190,6 +190,9 @@ protected trait TagNameFinder {
 
   protected def getTagTypeFromManifest(implicit manifest: Manifest[_]) =
     manifest.runtimeClass.getSimpleName.toLowerCase
+
+  protected def tagName =
+    getClass.getSimpleName.toLowerCase
 
 }
 

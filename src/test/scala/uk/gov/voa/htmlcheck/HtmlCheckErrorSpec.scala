@@ -16,8 +16,32 @@
 
 package uk.gov.voa.htmlcheck
 
+import cats.data.Xor._
+import uk.gov.voa.htmlcheck.elements.AttributeName
 import uk.gov.voa.htmlcheck.elements.ElementAttribute.IdAttribute
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
+
+class ElementSiblingNotFoundSpec extends UnitSpec {
+
+  "message" should {
+
+    "say 'Element of type 'p' with IdAttribute=id not found' when both attribute and explanation given" in {
+
+      val error = ElementSiblingNotFound("not found", "p", Right(IdAttribute("id")))
+
+      error.message shouldBe "Element of type 'p' with IdAttribute=id not found"
+    }
+
+    "say 'Element of type 'p' not found' when explanation is given but no attribute" in {
+
+      val error = ElementSiblingNotFound("not found", "p", Left(AttributeNotFound(AttributeName("id"))))
+
+      error.message shouldBe "Element of type 'p' not found"
+    }
+
+  }
+
+}
 
 class MoreThanOneElementFoundSpec extends UnitSpec {
 

@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element
 import uk.gov.voa.htmlcheck.Html.Implicits._
 import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 import uk.gov.voa.htmlcheck.tooling.UnitSpec
-import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, ElementSiblingNotFound, NoElementsFound}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, ElementSiblingNotFound}
 
 class ElementPropertiesSpec extends UnitSpec {
 
@@ -52,7 +52,7 @@ class ElementPropertiesSpec extends UnitSpec {
       val Left(error) = parent.findOnlyDescendantBy[IdAttribute, TextArea](IdAttribute("2"))
         .flatMap(_.nextSibling[TextArea])
 
-      error shouldBe ElementSiblingNotFound("has no direct next sibling", Right(IdAttribute("2")))
+      error shouldBe ElementSiblingNotFound("has no direct next sibling", "textarea", Right(IdAttribute("2")))
     }
 
     "return child direct with the given id" in new TestCase {
@@ -81,14 +81,14 @@ class ElementPropertiesSpec extends UnitSpec {
 
       val textArea = snippet.findFirstDescendantBy[IdAttribute, TextArea]("3").getOrError
 
-      textArea.findNextClosestSiblingOfType[Li] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'li'", Right(IdAttribute("3"))))
+      textArea.findNextClosestSiblingOfType[Li] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'li'", "textarea", Right(IdAttribute("3"))))
     }
 
     "return ElementSiblingNotFound when there is no following sibling of the required type" in new TestCase {
 
       val p = snippet.findFirstDescendantBy[IdAttribute, P]("p1").getOrError
 
-      p.findNextClosestSiblingOfType[P] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'p'", Right(IdAttribute("p1"))))
+      p.findNextClosestSiblingOfType[P] shouldBe Left(ElementSiblingNotFound("has no next sibling of type 'p'", "p", Right(IdAttribute("p1"))))
     }
 
     "return the first following sibling of the given type" in {

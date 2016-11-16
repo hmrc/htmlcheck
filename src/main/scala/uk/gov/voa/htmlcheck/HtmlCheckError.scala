@@ -18,7 +18,6 @@ package uk.gov.voa.htmlcheck
 
 import cats.data.Xor
 import uk.gov.voa.htmlcheck.elements.{AttributeName, ElementAttribute}
-import uk.gov.voa.htmlcheck.elements.ElementAttribute._
 
 sealed trait HtmlCheckError extends Throwable {
   protected def message: String
@@ -30,8 +29,12 @@ case class AttributeNotFound(attributeName: AttributeName) extends HtmlCheckErro
   val message = s"No '$attributeName' attribute found"
 }
 
-case class ElementSiblingNotFound(explanation: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
-  val message = s"Element${maybeAttribute.map(attribute => s" with ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")} $explanation"
+case class ElementSiblingNotFound(explanation: String,
+                                  tagType: String,
+                                  maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
+  val message = s"Element of type '$tagType'" +
+    s"${maybeAttribute.map(attribute => s" with ${attribute.getClass.getSimpleName}=$attribute").getOrElse("")}" +
+    s" $explanation"
 }
 
 case class ElementOfWrongType(expectedType: String, actualType: String, maybeAttribute: HtmlCheckError Xor ElementAttribute) extends HtmlCheckError {
