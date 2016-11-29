@@ -52,7 +52,7 @@ case class SelectOption(protected val element: Element) extends Input {
 
 object SelectOption {
 
-  private case object SelectedAttribute extends ElementAttribute {
+  private case object SelectedAttribute extends ElementAttributeWithValue {
 
     lazy val value = "selected"
     type SelectedAttribute = SelectedAttribute.type

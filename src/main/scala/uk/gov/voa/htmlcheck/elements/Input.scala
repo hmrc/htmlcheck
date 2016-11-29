@@ -49,7 +49,7 @@ object Label {
     else
       Right(Label(element))
 
-  case class ForAttribute(value: String) extends ElementAttribute
+  case class ForAttribute(value: String) extends ElementAttributeWithValue
 
   object ForAttribute {
 

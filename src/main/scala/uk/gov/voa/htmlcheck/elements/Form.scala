@@ -42,7 +42,7 @@ object Form {
     else
       Right(Form(element))
 
-  case class ActionAttribute(value: String) extends ElementAttribute
+  case class ActionAttribute(value: String) extends ElementAttributeWithValue
 
   object ActionAttribute {
 
@@ -53,7 +53,7 @@ object Form {
       }
   }
 
-  trait MethodAttribute extends ElementAttribute
+  trait MethodAttribute extends ElementAttributeWithValue
 
   object MethodAttribute {
 

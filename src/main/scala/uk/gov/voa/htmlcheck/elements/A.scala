@@ -41,7 +41,7 @@ object A {
     else
       Right(A(element))
 
-  case class HrefAttribute(value: String) extends ElementAttribute
+  case class HrefAttribute(value: String) extends ElementAttributeWithValue
 
   object HrefAttribute {
 

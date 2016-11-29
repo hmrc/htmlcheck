@@ -45,7 +45,7 @@ trait ElementProperties extends TagNameFinder {
 
   lazy val text: String = element.text()
 
-  def attribute(name: AttributeName): HtmlCheckError Xor GenericAttribute = GenericAttribute(name, element)
+  def attribute(name: AttributeName): HtmlCheckError Xor CustomAttribute = CustomAttribute(name, element)
 
   def nextSibling[T <: HtmlElement](implicit elementWrapper: Element => HtmlCheckError Xor T,
                                     manifest: Manifest[T]): HtmlCheckError Xor T =

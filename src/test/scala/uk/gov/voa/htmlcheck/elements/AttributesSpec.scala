@@ -28,11 +28,11 @@ import uk.gov.voa.htmlcheck.tooling.generators.GeneratorOf
 
 class XorElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
 
-
-  private val attributes = for {
+  private val attributes: Gen[ElementAttribute] = for {
     value <- GeneratorOf.nonEmptyString
     attribute <- Gen.oneOf(Seq(
-      GenericAttribute(AttributeName(s"attribute-$value"), value),
+      CustomAttribute(AttributeName(s"attribute-$value"), Some(value)),
+      CustomAttribute(AttributeName(s"no-value-attribute-$value"), None),
       IdAttribute(s"id-$value"),
       ValueAttribute(s"value-$value"),
       NameAttribute(s"name-$value"),
@@ -44,10 +44,10 @@ class XorElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
 
   "asString" should {
 
-    "return attribute's value if it's not None" in {
+    "return attribute's toString if it exists" in {
       forAll(attributes.map(right)) {
         case maybeAttribute@Right(attribute) =>
-          maybeAttribute.asString shouldBe attribute.value
+          maybeAttribute.asString shouldBe attribute.toString
         case _ => fail("Wrong test configuration")
       }
     }
@@ -55,7 +55,21 @@ class XorElementAttributeOpsSpec extends UnitSpec with PropertyChecks {
     "return an empty String if it's None" in {
       Left(AttributeNotFound(AttributeName("id"))).asString shouldBe ""
     }
+  }
 
+  "present" should {
+
+    "return true if there's an attribute" in {
+      forAll(attributes.map(right)) {
+        case maybeAttribute@Right(attribute) =>
+          maybeAttribute.present shouldBe true
+        case _ => fail("Wrong test configuration")
+      }
+    }
+
+    "return false if there's no an attribute" in {
+      Left(AttributeNotFound(AttributeName("id"))).present shouldBe false
+    }
   }
 }
 
@@ -83,4 +97,30 @@ class ImplicitSpec extends UnitSpec {
     }
   }
 
+}
+
+class CustomAttributeSpec extends UnitSpec {
+
+  import uk.gov.voa.htmlcheck.Html.Implicits._
+
+  private val snippet =
+    """<div id="div" attribute-with-value="value" attribute-without-value />
+      |""".toHtml
+
+  private val div = snippet.findFirstDescendantOfType[Div].getOrError
+
+  "apply" should {
+
+    "return Right of CustomAttribute if there's an attribute and it has some value" in {
+      div.attribute(AttributeName("attribute-with-value")) shouldBe Right(CustomAttribute(AttributeName("attribute-with-value"), value = Some("value")))
+    }
+
+    "return Right of CustomAttribute if there's an attribute and it has no value" in {
+      div.attribute(AttributeName("attribute-without-value")) shouldBe Right(CustomAttribute(AttributeName("attribute-without-value"), value = None))
+    }
+
+    "return Left if there is no queries attribute" in {
+      div.attribute(AttributeName("non-existing-attribute")) shouldBe Left(AttributeNotFound(AttributeName("non-existing-attribute")))
+    }
+  }
 }

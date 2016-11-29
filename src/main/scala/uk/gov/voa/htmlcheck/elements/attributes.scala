@@ -35,7 +35,7 @@ package uk.gov.voa.htmlcheck.elements
 import cats.data.Xor
 import cats.data.Xor._
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.{HtmlCheckError, AttributeNotFound}
+import uk.gov.voa.htmlcheck.{AttributeNotFound, HtmlCheckError}
 
 import scala.language.implicitConversions
 
@@ -45,12 +45,20 @@ case class AttributeName(value: String) {
   override def toString = value
 }
 
-trait ElementAttribute {
-  require(value.nonEmpty)
+trait ElementAttribute
+
+trait ElementAttributeWithValue extends ElementAttribute {
 
   def value: String
 
   override def toString = value
+}
+
+trait ElementAttributeWithOptionalValue extends ElementAttribute {
+
+  def value: Option[String]
+
+  override def toString = value.getOrElse("")
 }
 
 object ElementAttribute {
@@ -62,9 +70,11 @@ object ElementAttribute {
     implicit class XorElementAttributeOps(maybeAttribute: HtmlCheckError Xor ElementAttribute) {
 
       lazy val asString: String = maybeAttribute.fold(
-        error => "",
-        attribute => attribute.value
+        _ => "",
+        attribute => attribute.toString
       )
+
+      lazy val present: Boolean = maybeAttribute.isRight
     }
 
     implicit def stringToClassAttributeWrapper(className: String): ClassAttribute = ClassAttribute(className)
@@ -73,25 +83,21 @@ object ElementAttribute {
 
   }
 
-  case class GenericAttribute(name: AttributeName, value: String) extends ElementAttribute {
-    require(value.nonEmpty)
+  case class CustomAttribute(name: AttributeName, value: Option[String]) extends ElementAttributeWithOptionalValue
 
-    override def toString = value
-  }
+  object CustomAttribute {
 
-  object GenericAttribute {
-
-    def apply(name: AttributeName, element: Element): HtmlCheckError Xor GenericAttribute =
+    def apply(name: AttributeName, element: Element): HtmlCheckError Xor CustomAttribute =
       element.hasAttr(name.value) match {
         case false => Left(AttributeNotFound(name))
         case true => element.attr(name.value) match {
-          case "" => Left(AttributeNotFound(name))
-          case value => Right(GenericAttribute(name, value))
+          case "" => Right(CustomAttribute(name, value = None))
+          case value => Right(CustomAttribute(name, Some(value)))
         }
       }
   }
 
-  case class IdAttribute(value: String) extends ElementAttribute
+  case class IdAttribute(value: String) extends ElementAttributeWithValue
 
   object IdAttribute {
 
@@ -102,7 +108,7 @@ object ElementAttribute {
       }
   }
 
-  case class TypeAttribute(value: String) extends ElementAttribute
+  case class TypeAttribute(value: String) extends ElementAttributeWithValue
 
   object TypeAttribute {
 
@@ -113,7 +119,7 @@ object ElementAttribute {
       }
   }
 
-  case class TagAttribute(value: String) extends ElementAttribute
+  case class TagAttribute(value: String) extends ElementAttributeWithValue
 
   object TagAttribute {
 
@@ -124,7 +130,7 @@ object ElementAttribute {
       }
   }
 
-  case class NameAttribute(value: String) extends ElementAttribute
+  case class NameAttribute(value: String) extends ElementAttributeWithValue
 
   object NameAttribute {
 
@@ -135,7 +141,7 @@ object ElementAttribute {
       }
   }
 
-  case class ValueAttribute(value: String) extends ElementAttribute
+  case class ValueAttribute(value: String) extends ElementAttributeWithValue
 
   object ValueAttribute {
 
@@ -146,7 +152,7 @@ object ElementAttribute {
       }
   }
 
-  case class ClassAttribute(value: String) extends ElementAttribute
+  case class ClassAttribute(value: String) extends ElementAttributeWithValue
 
   object ClassAttribute {
 

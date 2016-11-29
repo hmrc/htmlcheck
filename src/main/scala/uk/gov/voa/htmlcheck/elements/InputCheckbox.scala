@@ -32,7 +32,7 @@ case class InputCheckbox(protected val element: Element) extends Input {
 
 object InputCheckbox {
 
-  private case object CheckedAttribute extends ElementAttribute {
+  private case object CheckedAttribute extends ElementAttributeWithValue {
 
     lazy val value = "checked"
     type CheckedAttribute = CheckedAttribute.type
