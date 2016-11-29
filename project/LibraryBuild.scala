@@ -11,7 +11,7 @@ object LibraryBuild extends Build {
 
   lazy val scoverageSettings = Seq(
     ScoverageKeys.coverageExcludedPackages := "<empty>;.*BuildInfo.*",
-    ScoverageKeys.coverageMinimum := 70,
+    ScoverageKeys.coverageMinimum := 72,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
     ScoverageKeys.coverageEnabled := false

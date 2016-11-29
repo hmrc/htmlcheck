@@ -19,7 +19,7 @@ package uk.gov.voa.htmlcheck.elements
 import cats.data.Xor
 import cats.data.Xor.{Left, Right}
 import org.jsoup.nodes.Element
-import uk.gov.voa.htmlcheck.elements.ElementAttribute.{IdAttribute, ValueAttribute}
+import uk.gov.voa.htmlcheck.elements.ElementAttribute.{IdAttribute, TypeAttribute, ValueAttribute}
 import uk.gov.voa.htmlcheck.elements.Label.ForAttribute
 import uk.gov.voa.htmlcheck.{AttributeNotFound, ElementOfWrongType, HtmlCheckError}
 
@@ -31,6 +31,8 @@ trait Input
     with ContainerElement {
 
   lazy val value: HtmlCheckError Xor ValueAttribute = ValueAttribute(element)
+
+  lazy val typeAttribute: HtmlCheckError Xor TypeAttribute = TypeAttribute(element)
 }
 
 case class Label(protected val element: Element)
